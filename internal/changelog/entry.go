@@ -10,8 +10,10 @@ import (
 )
 
 type Entry struct {
-	Title string `yaml:"title"`
-	Type  string `yaml:"type"`
+	Title  string `yaml:"title"`
+	Type   string `yaml:"type"`
+	Author string `yaml:"author"`
+	Group  string `yaml:"group"`
 }
 
 func (e Entry) YAMLData() ([]byte, error) {
@@ -50,7 +52,12 @@ func (e Entry) WriteToFile() error {
 		return err
 	}
 
-	path := filepath.Join(cwd, "changelogs", "unreleased", e.Filename())
+	pathDir := filepath.Join(cwd, "changelogs", "unreleased")
+	pathFile := filepath.Join(pathDir, e.Filename())
 
-	return os.WriteFile(path, data, 0644)
+	if err := os.MkdirAll(pathDir, 0755); err != nil {
+		return err
+	}
+
+	return os.WriteFile(pathFile, data, 0644)
 }
