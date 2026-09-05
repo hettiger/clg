@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"charm.land/huh/v2"
+	"github.com/hettiger/clg/internal/validation"
 	"github.com/spf13/cobra"
 )
 
@@ -45,11 +46,13 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 				).
 				Value(&changeType),
 		))
+	} else if err := validateChangeType(changeType); err != nil {
+		return err
 	}
 
 	if message == "" {
 		groups = append(groups, huh.NewGroup(
-			huh.NewText().
+			huh.NewInput().
 				Title("Changelog Entry").
 				Value(&message),
 		))
@@ -65,4 +68,21 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 	cmd.Println(message)
 
 	return nil
+}
+
+func validateChangeType(value string) error {
+	return validation.ValidateIn(
+		"Type of change",
+		value,
+		"added",
+		"fixed",
+		"hotfix",
+		"changed",
+		"deprecated",
+		"removed",
+		"security",
+		"performance",
+		"other",
+		"ignore",
+	)
 }
