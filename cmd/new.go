@@ -32,21 +32,15 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 	var groups []*huh.Group
 
 	if changeType == "" {
+		options := make([]huh.Option[string], len(changelog.SupportedTypes()))
+		for i, t := range changelog.SupportedTypes() {
+			options[i] = huh.NewOption(t.Label, t.Keyword)
+		}
+
 		groups = append(groups, huh.NewGroup(
 			huh.NewSelect[string]().
 				Title("Type of Change").
-				Options(
-					huh.NewOption("New Feature", "added"),
-					huh.NewOption("Bug Fix", "fixed"),
-					huh.NewOption("Hotfix", "hotfix"),
-					huh.NewOption("Feature Change", "changed"),
-					huh.NewOption("New Deprecation", "deprecated"),
-					huh.NewOption("Feature Removal", "removed"),
-					huh.NewOption("Security Fix", "security"),
-					huh.NewOption("Performance Improvement", "performance"),
-					huh.NewOption("Other", "other"),
-					huh.NewOption("No Changelog", "ignore"),
-				).
+				Options(options...).
 				Validate(validateChangeType).
 				Value(&changeType),
 		))
@@ -91,16 +85,7 @@ func validateChangeType(value string) error {
 	return validation.ValidateIn(
 		"Type of change",
 		value,
-		"added",
-		"fixed",
-		"hotfix",
-		"changed",
-		"deprecated",
-		"removed",
-		"security",
-		"performance",
-		"other",
-		"ignore",
+		changelog.SupportedTypeKeywords()...,
 	)
 }
 
