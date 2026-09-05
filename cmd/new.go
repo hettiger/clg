@@ -68,15 +68,15 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 	message = strings.TrimSpace(message)
 
 	entry := changelog.Entry{
-		Type:    changeType,
-		Message: message,
+		Title: message,
+		Type:  changeType,
 	}
-	str, err := entry.YAML()
+	err := entry.WriteToFile()
 	if err != nil {
 		return err
 	}
 
-	cmd.Print(str)
+	cmd.Println("Success!")
 
 	return nil
 }

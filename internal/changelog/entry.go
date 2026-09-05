@@ -1,10 +1,17 @@
 package changelog
 
-import "go.yaml.in/yaml/v3"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"go.yaml.in/yaml/v3"
+)
 
 type Entry struct {
-	Type    string `yaml:"type"`
-	Message string `yaml:"message"`
+	Title string `yaml:"title"`
+	Type  string `yaml:"type"`
 }
 
 func (e Entry) YAMLData() ([]byte, error) {
@@ -18,4 +25,32 @@ func (e Entry) YAML() (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func (e Entry) Filename() string {
+	return e.FilenameAt(time.Now())
+}
+
+func (e Entry) FilenameAt(t time.Time) string {
+	return fmt.Sprintf(
+		"%s-%s.yml",
+		t.UTC().Format("2006-01-02-150405"),
+		e.Type,
+	)
+}
+
+func (e Entry) WriteToFile() error {
+	data, err := e.YAMLData()
+	if err != nil {
+		return err
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	path := filepath.Join(cwd, "changelogs", "unreleased", e.Filename())
+
+	return os.WriteFile(path, data, 0644)
 }
