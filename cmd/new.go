@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"charm.land/huh/v2"
+	"github.com/hettiger/clg/internal/changelog"
 	"github.com/hettiger/clg/internal/validation"
 	"github.com/spf13/cobra"
 )
@@ -72,8 +73,16 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 
 	message = strings.TrimSpace(message)
 
-	cmd.Println(changeType)
-	cmd.Println(message)
+	entry := changelog.Entry{
+		Type:    changeType,
+		Message: message,
+	}
+	str, err := entry.YAML()
+	if err != nil {
+		return err
+	}
+
+	cmd.Print(str)
 
 	return nil
 }
