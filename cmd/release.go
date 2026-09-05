@@ -9,20 +9,23 @@ var releaseCmd = &cobra.Command{
 	Use:   "release [tag]",
 	Short: "Build new changelog from unreleased changelog entries",
 	Args:  cobra.ExactArgs(1),
-	RunE:  buildNewChangelog,
+	RunE:  addRelease,
 }
 
 func init() {
 	rootCmd.AddCommand(releaseCmd)
 }
 
-func buildNewChangelog(cmd *cobra.Command, args []string) error {
+func addRelease(cmd *cobra.Command, args []string) error {
 	release, err := changelog.ReleaseFromUnreleasedEntries(args[0])
 	if err != nil {
 		return err
 	}
 
-	cmd.Print(release.Markdown())
+	file, err := changelog.FileFromCwd()
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return file.AddRelease(release)
 }
