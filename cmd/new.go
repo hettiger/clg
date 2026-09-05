@@ -60,7 +60,11 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(groups) > 0 {
-		if err := huh.NewForm(groups...).Run(); err != nil {
+		keymap := huh.NewDefaultKeyMap()
+		keymap.Input.Prev.Unbind()
+		keymap.Select.Prev.Unbind()
+
+		if err := huh.NewForm(groups...).WithKeyMap(keymap).Run(); err != nil {
 			return err
 		}
 	}
