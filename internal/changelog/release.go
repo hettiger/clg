@@ -2,6 +2,7 @@ package changelog
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -36,11 +37,10 @@ func ReleaseFromUnreleasedEntries(tag string) (Release, error) {
 	return release, nil
 }
 
-func (r Release) Markdown() (string, error) {
-	result := ""
+func (r Release) Markdown() string {
+	var result strings.Builder
 
-	result += fmt.Sprintf("## [%s] - %s", r.Tag, time.Now().UTC().Format("2006-01-02"))
-	result += fmt.Sprintln()
+	fmt.Fprintf(&result, "## [%s] - %s\n", r.Tag, time.Now().UTC().Format("2006-01-02"))
 
 	for _, groupType := range SupportedTypes() {
 		if groupType.Keyword == "ignore" {
@@ -58,15 +58,12 @@ func (r Release) Markdown() (string, error) {
 			groupCountSuffix = "changes"
 		}
 
-		result += fmt.Sprintln()
-		result += fmt.Sprintf("### %s (%v %s)", groupType.Label, groupCount, groupCountSuffix)
-		result += fmt.Sprintln()
-		result += fmt.Sprintln()
+		fmt.Fprintf(&result, "\n### %s (%d %s)\n\n", groupType.Label, groupCount, groupCountSuffix)
 
 		for _, groupEntry := range groupedEntries {
-			result += fmt.Sprintln("- " + groupEntry.Title)
+			fmt.Fprintf(&result, "- %s\n", groupEntry.Title)
 		}
 	}
 
-	return result, nil
+	return result.String()
 }

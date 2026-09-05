@@ -22,12 +22,7 @@ func buildNewChangelog(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	markdown, err := release.Markdown()
-	if err != nil {
-		return err
-	}
-
-	cmd.Print(markdown)
+	cmd.Print(release.Markdown())
 
 	return nil
 }
