@@ -44,6 +44,7 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 					huh.NewOption("Other", "other"),
 					huh.NewOption("No Changelog", "ignore"),
 				).
+				Validate(validateChangeType).
 				Value(&changeType),
 		))
 	} else if err := validateChangeType(changeType); err != nil {
@@ -54,8 +55,11 @@ func addChangelogEntry(cmd *cobra.Command, args []string) error {
 		groups = append(groups, huh.NewGroup(
 			huh.NewInput().
 				Title("Changelog Entry").
+				Validate(validateMessage).
 				Value(&message),
 		))
+	} else if err := validateMessage(message); err != nil {
+		return err
 	}
 
 	if len(groups) > 0 {
@@ -85,4 +89,8 @@ func validateChangeType(value string) error {
 		"other",
 		"ignore",
 	)
+}
+
+func validateMessage(value string) error {
+	return validation.ValidateMin("Changelog entry", value, 1)
 }
