@@ -7,21 +7,23 @@ import (
 )
 
 type File struct {
-	Path string
+	Path   string
+	Marker string
 }
 
-func FileFromCwd() (File, error) {
+func FileFromCwd(marker string) (File, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return File{}, err
 	}
 
-	return FileFromDir(cwd), nil
+	return FileFromDir(cwd, marker), nil
 }
 
-func FileFromDir(dir string) File {
+func FileFromDir(dir string, marker string) File {
 	return File{
-		Path: filepath.Join(dir, "CHANGELOG.md"),
+		Path:   filepath.Join(dir, "CHANGELOG.md"),
+		Marker: marker,
 	}
 }
 
@@ -31,8 +33,7 @@ func (f File) AddRelease(release Release) error {
 		return err
 	}
 
-	marker := "<!-- CLG -->\n\n"
-	log = strings.Replace(log, marker, marker+release.Markdown()+"\n\n", 1)
+	log = strings.Replace(log, f.Marker, f.Marker+"\n\n"+release.Markdown(), 1)
 
 	return f.Write(log)
 }

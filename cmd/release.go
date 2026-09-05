@@ -5,6 +5,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	marker string
+)
+
 var releaseCmd = &cobra.Command{
 	Use:   "release [tag]",
 	Short: "Build new changelog from unreleased changelog entries",
@@ -14,6 +18,8 @@ var releaseCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(releaseCmd)
+
+	releaseCmd.Flags().StringVarP(&marker, "marker", "m", "<!-- CLG -->", "insertion marker for new releases")
 }
 
 func addRelease(cmd *cobra.Command, args []string) error {
@@ -22,7 +28,7 @@ func addRelease(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	file, err := changelog.FileFromCwd()
+	file, err := changelog.FileFromCwd(marker)
 	if err != nil {
 		return err
 	}
