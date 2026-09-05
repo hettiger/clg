@@ -1,6 +1,9 @@
 package changelog
 
-import "slices"
+import (
+	"fmt"
+	"slices"
+)
 
 type Type struct {
 	Label   string
@@ -18,6 +21,16 @@ var supportedTypes = [...]Type{
 	{Label: "Performance Improvement", Keyword: "performance"},
 	{Label: "Other", Keyword: "other"},
 	{Label: "No Changelog", Keyword: "ignore"},
+}
+
+func TypeFromKeyword(keyword string) (Type, error) {
+	for _, t := range SupportedTypes() {
+		if t.Keyword == keyword {
+			return t, nil
+		}
+	}
+
+	return Type{}, fmt.Errorf("Unknown type keyword provided (%s)", keyword)
 }
 
 func SupportedTypes() []Type {
