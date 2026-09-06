@@ -1,6 +1,7 @@
 package changelog
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +32,10 @@ func (f File) AddRelease(release Release) (string, error) {
 	log, err := f.Read()
 	if err != nil {
 		return "", err
+	}
+
+	if !strings.Contains(log, f.Marker) {
+		return "", fmt.Errorf(`Marker "%s" is missing in CHANGELOG.md`, f.Marker)
 	}
 
 	md := release.Markdown()
