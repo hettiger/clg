@@ -1,0 +1,22 @@
+[
+  {
+    "label": "build",
+    "command": "go build .",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "install",
+    "command": "go install .",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "test:coverage",
+    "command": "go test ./... -coverprofile=coverage.out; go tool cover -html=coverage.out",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "test:coverage:summary",
+    "command": "go test ./... -coverprofile=coverage.out; go tool cover -func=coverage.out",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]
