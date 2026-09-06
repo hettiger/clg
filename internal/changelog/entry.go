@@ -9,6 +9,11 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
+type EntryFile struct {
+	Entry Entry
+	Path  string
+}
+
 type Entry struct {
 	Title  string `yaml:"title"`
 	Type   string `yaml:"type"`
@@ -64,6 +69,20 @@ func (e Entry) WriteToFile() error {
 }
 
 func UnreleasedEntries() ([]Entry, error) {
+	entryFiles, err := UnreleasedEntryFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	entries := make([]Entry, len(entryFiles))
+	for i, ef := range entryFiles {
+		entries[i] = ef.Entry
+	}
+
+	return entries, nil
+}
+
+func UnreleasedEntryFiles() ([]EntryFile, error) {
 	dir, err := unreleasedDir()
 	if err != nil {
 		return nil, err
@@ -74,7 +93,7 @@ func UnreleasedEntries() ([]Entry, error) {
 		return nil, err
 	}
 
-	entries := make([]Entry, 0, len(dirEntries))
+	entryFiles := make([]EntryFile, 0, len(dirEntries))
 
 	for _, dirEntry := range dirEntries {
 		if dirEntry.IsDir() || filepath.Ext(dirEntry.Name()) != ".yml" {
@@ -91,10 +110,13 @@ func UnreleasedEntries() ([]Entry, error) {
 			return nil, err
 		}
 
-		entries = append(entries, entry)
+		entryFiles = append(entryFiles, EntryFile{
+			Entry: entry,
+			Path:  filepath.Join(dir, dirEntry.Name()),
+		})
 	}
 
-	return entries, nil
+	return entryFiles, nil
 }
 
 func unreleasedDir() (string, error) {
