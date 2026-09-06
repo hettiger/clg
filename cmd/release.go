@@ -17,7 +17,7 @@ func NewReleaseCmd(app *App) *cobra.Command {
 
 	releaseCmd := &cobra.Command{
 		Use:   "release [tag]",
-		Short: "Add new release to the changelog",
+		Short: "Add a new release to the changelog",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return addRelease(app, args, state)
