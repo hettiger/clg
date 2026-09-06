@@ -91,3 +91,18 @@ func TestEntryFromYAML(t *testing.T) {
 		})
 	}
 }
+
+func TestEntryYAML(t *testing.T) {
+	dataValid, err := os.ReadFile("testdata/entry_valid.yml")
+	require.NoError(t, err)
+	entry, err := changelog.EntryFromYAML(dataValid)
+	require.NoError(t, err)
+
+	gotData, err := entry.YAMLData()
+	require.NoError(t, err)
+	assert.Equal(t, dataValid, gotData)
+
+	gotYAML, err := entry.YAML()
+	require.NoError(t, err)
+	assert.Equal(t, string(dataValid), gotYAML)
+}
