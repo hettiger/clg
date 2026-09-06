@@ -1,14 +1,16 @@
 package changelog_test
 
 import (
+	"os"
 	"testing"
 	"time"
 
 	"github.com/hettiger/clg/internal/changelog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestEntry_FilenameAt(t *testing.T) {
+func TestEntryFilenameAt(t *testing.T) {
 	tests := []struct {
 		name  string
 		entry changelog.Entry
@@ -31,6 +33,60 @@ func TestEntry_FilenameAt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.entry.FilenameAt(tt.t)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestEntryFromYAML(t *testing.T) {
+	tests := []struct {
+		name     string
+		dataFile string
+		want     changelog.Entry
+		wantErr  bool
+	}{
+		{
+			name:     "valid",
+			dataFile: "entry_valid.yml",
+			want: changelog.Entry{
+				Title:  "Fake Title",
+				Type:   "added",
+				Author: "Fake Author",
+				Group:  "Fake Group",
+			},
+			wantErr: false,
+		},
+		{
+			name:     "invalid",
+			dataFile: "entry_invalid.yml",
+			want:     changelog.Entry{},
+			wantErr:  true,
+		},
+		{
+			name:     "unsupported type",
+			dataFile: "entry_unsupported_type.yml",
+			want:     changelog.Entry{},
+			wantErr:  true,
+		},
+		{
+			name:     "empty title",
+			dataFile: "entry_empty_title.yml",
+			want:     changelog.Entry{},
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := os.ReadFile("testdata/" + tt.dataFile)
+			require.NoError(t, err)
+			got, gotErr := changelog.EntryFromYAML(data)
+
+			if tt.wantErr {
+				require.Error(t, gotErr)
+			} else {
+				require.NoError(t, gotErr)
+			}
+
 			assert.Equal(t, tt.want, got)
 		})
 	}

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/hettiger/clg/internal/validation"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -26,6 +27,9 @@ func EntryFromYAML(data []byte) (Entry, error) {
 	if err := yaml.Unmarshal(data, &entry); err != nil {
 		return entry, err
 	}
+	if err := entry.Validate(); err != nil {
+		return Entry{}, err
+	}
 	return entry, nil
 }
 
@@ -40,6 +44,18 @@ func (e Entry) YAML() (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func (e Entry) Validate() error {
+	if err := validation.ValidateMin("title", e.Title, 1); err != nil {
+		return err
+	}
+
+	if err := validation.ValidateIn("type", e.Type, SupportedTypeKeywords()...); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (e Entry) Filename() string {
