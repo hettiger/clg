@@ -5,29 +5,32 @@ import (
 
 	"charm.land/huh/v2"
 	"github.com/hettiger/clg/cmd/output"
-	"github.com/hettiger/clg/internal/changelog"
 	"github.com/spf13/cobra"
 )
 
-var (
+type cleanCmdState struct {
 	isConfirmed bool
-)
-
-var cleanCmd = &cobra.Command{
-	Use:   "clean",
-	Short: "Remove all unreleased changelog entries",
-	Args:  cobra.NoArgs,
-	RunE:  removeUnreleasedChangelogEntries,
 }
 
-func init() {
-	rootCmd.AddCommand(cleanCmd)
+func NewCleanCmd(app *App) *cobra.Command {
+	state := &cleanCmdState{}
 
-	cleanCmd.Flags().BoolVarP(&isConfirmed, "force", "f", false, "Force remove files")
+	cleanCmd := &cobra.Command{
+		Use:   "clean",
+		Short: "Remove all unreleased changelog entries",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return removeUnreleasedChangelogEntries(app, state)
+		},
+	}
+
+	cleanCmd.Flags().BoolVarP(&state.isConfirmed, "force", "f", false, "Force remove files")
+
+	return cleanCmd
 }
 
-func removeUnreleasedChangelogEntries(cmd *cobra.Command, args []string) error {
-	files, err := changelog.UnreleasedEntryFiles()
+func removeUnreleasedChangelogEntries(app *App, state *cleanCmdState) error {
+	files, err := app.changelogEntryStore.UnreleasedEntryFiles()
 	if err != nil {
 		return err
 	}
@@ -36,12 +39,12 @@ func removeUnreleasedChangelogEntries(cmd *cobra.Command, args []string) error {
 		return output.PrintSuccess("No logs. Nothing to delete.")
 	}
 
-	if !isConfirmed {
+	if !state.isConfirmed {
 		form := huh.NewForm(
 			huh.NewGroup(
 				huh.NewConfirm().
 					Title("Delete all unreleased changelog entry files?").
-					Value(&isConfirmed),
+					Value(&state.isConfirmed),
 			),
 		)
 
@@ -50,7 +53,7 @@ func removeUnreleasedChangelogEntries(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if !isConfirmed {
+	if !state.isConfirmed {
 		return nil
 	}
 

@@ -8,22 +8,19 @@ import (
 
 type Release struct {
 	Tag    string
-	Groups map[Type][]Entry
+	Groups map[Type][]ChangelogEntry
+	time   time.Time
 }
 
-func ReleaseFromUnreleasedEntries(tag string) (Release, error) {
-	unreleasedEntries, err := UnreleasedEntries()
-	if err != nil {
-		return Release{}, err
-	}
-
+func NewRelease(tag string, unreleasedEntries []ChangelogEntry, time time.Time) (Release, error) {
 	supportedTypes := SupportedTypes()
 	release := Release{
 		Tag:    tag,
-		Groups: make(map[Type][]Entry, len(supportedTypes)),
+		Groups: make(map[Type][]ChangelogEntry, len(supportedTypes)),
+		time:   time,
 	}
 	for _, supportedType := range supportedTypes {
-		release.Groups[supportedType] = make([]Entry, 0)
+		release.Groups[supportedType] = make([]ChangelogEntry, 0)
 	}
 
 	for _, entry := range unreleasedEntries {
@@ -40,7 +37,7 @@ func ReleaseFromUnreleasedEntries(tag string) (Release, error) {
 func (r Release) Markdown() string {
 	var result strings.Builder
 
-	fmt.Fprintf(&result, "## [%s] - %s", r.Tag, time.Now().UTC().Format("2006-01-02"))
+	fmt.Fprintf(&result, "## [%s] - %s", r.Tag, r.time.Format("2006-01-02"))
 
 	for _, groupType := range SupportedTypes() {
 		if groupType.Keyword == "ignore" {

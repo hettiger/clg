@@ -4,28 +4,29 @@ import (
 	"strconv"
 
 	"github.com/hettiger/clg/cmd/output"
-	"github.com/hettiger/clg/internal/changelog"
 	"github.com/spf13/cobra"
 )
 
-var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Show unreleased changelog entries",
-	RunE:  showUnreleasedChangelogEntries,
+func NewShowCmd(app *App) *cobra.Command {
+	showCmd := &cobra.Command{
+		Use:   "show",
+		Short: "Show unreleased changelog entries",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return showUnreleasedChangelogEntries(app)
+		},
+	}
+
+	return showCmd
 }
 
-func init() {
-	rootCmd.AddCommand(showCmd)
-}
-
-func showUnreleasedChangelogEntries(cmd *cobra.Command, args []string) error {
-	unreleasedEntries, err := changelog.UnreleasedEntries()
+func showUnreleasedChangelogEntries(app *App) error {
+	unreleasedEntries, err := app.changelogEntryStore.UnreleasedEntries()
 	if err != nil {
 		return err
 	}
 
 	if len(unreleasedEntries) < 1 {
-		return output.PrintSuccess("No logs. Nothing to show.")
+		return output.PrintSuccess("No changelog entries. Nothing to show.")
 	}
 
 	headers := []string{"No.", "Type", "Log", "Author"}

@@ -8,42 +8,54 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
+type releaseCmdState struct {
 	marker string
-)
-
-var releaseCmd = &cobra.Command{
-	Use:   "release [tag]",
-	Short: "Build new changelog from unreleased changelog entries",
-	Args:  cobra.ExactArgs(1),
-	RunE:  addRelease,
 }
 
-func init() {
-	rootCmd.AddCommand(releaseCmd)
+func NewReleaseCmd(app *App) *cobra.Command {
+	state := &releaseCmdState{}
 
-	releaseCmd.Flags().StringVarP(&marker, "marker", "m", "<!-- CLG -->", "insertion marker for new releases")
+	releaseCmd := &cobra.Command{
+		Use:   "release [tag]",
+		Short: "Add new release to the changelog",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return addRelease(app, args, state)
+		},
+	}
+
+	releaseCmd.Flags().StringVarP(
+		&state.marker,
+		"marker",
+		"m",
+		"<!-- CLG -->",
+		"insertion marker for new releases",
+	)
+
+	return releaseCmd
 }
 
-func addRelease(cmd *cobra.Command, args []string) error {
-	entryFiles, err := changelog.UnreleasedEntryFiles()
+func addRelease(app *App, args []string, state *releaseCmdState) error {
+	entryFiles, err := app.changelogEntryStore.UnreleasedEntryFiles()
 	if err != nil {
 		return err
 	}
 
 	if len(entryFiles) < 1 {
-		return output.PrintSuccess("No logs. Nothing to release.")
+		return output.PrintSuccess("No changelog entries. Nothing to release.")
 	}
 
-	release, err := changelog.ReleaseFromUnreleasedEntries(args[0])
+	unreleasedEntries, err := app.changelogEntryStore.UnreleasedEntries()
 	if err != nil {
 		return err
 	}
 
-	changelogFile, err := changelog.FileFromCwd(marker)
+	release, err := changelog.NewRelease(args[0], unreleasedEntries, app.now())
 	if err != nil {
 		return err
 	}
+
+	changelogFile := changelog.NewChangelogFile(app.rootDir, state.marker)
 
 	markdown, err := changelogFile.AddRelease(release)
 	if err != nil {

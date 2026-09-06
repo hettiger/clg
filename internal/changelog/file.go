@@ -7,28 +7,19 @@ import (
 	"strings"
 )
 
-type File struct {
+type ChangelogFile struct {
 	Path   string
 	Marker string
 }
 
-func FileFromCwd(marker string) (File, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return File{}, err
-	}
-
-	return FileFromDir(cwd, marker), nil
-}
-
-func FileFromDir(dir string, marker string) File {
-	return File{
+func NewChangelogFile(dir string, marker string) ChangelogFile {
+	return ChangelogFile{
 		Path:   filepath.Join(dir, "CHANGELOG.md"),
 		Marker: marker,
 	}
 }
 
-func (f File) AddRelease(release Release) (string, error) {
+func (f ChangelogFile) AddRelease(release Release) (string, error) {
 	log, err := f.Read()
 	if err != nil {
 		return "", err
@@ -44,7 +35,7 @@ func (f File) AddRelease(release Release) (string, error) {
 	return md, f.Write(log)
 }
 
-func (f File) Read() (string, error) {
+func (f ChangelogFile) Read() (string, error) {
 	data, err := os.ReadFile(f.Path)
 	if err != nil {
 		return "", err
@@ -53,6 +44,6 @@ func (f File) Read() (string, error) {
 	return string(data), nil
 }
 
-func (f File) Write(log string) error {
+func (f ChangelogFile) Write(log string) error {
 	return os.WriteFile(f.Path, []byte(log), 0644)
 }
