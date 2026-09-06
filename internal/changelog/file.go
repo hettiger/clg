@@ -27,15 +27,16 @@ func FileFromDir(dir string, marker string) File {
 	}
 }
 
-func (f File) AddRelease(release Release) error {
+func (f File) AddRelease(release Release) (string, error) {
 	log, err := f.Read()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	log = strings.Replace(log, f.Marker, f.Marker+"\n\n"+release.Markdown(), 1)
+	md := release.Markdown()
+	log = strings.Replace(log, f.Marker, f.Marker+"\n\n"+md+"\n", 1)
 
-	return f.Write(log)
+	return md, f.Write(log)
 }
 
 func (f File) Read() (string, error) {
