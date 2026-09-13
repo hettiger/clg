@@ -19,7 +19,7 @@ func NewChangelogFile(dir string, marker string) ChangelogFile {
 	}
 }
 
-func (f ChangelogFile) AddRelease(release Release) (string, error) {
+func (f ChangelogFile) AddRelease(release Markdownable) (string, error) {
 	log, err := f.Read()
 	if err != nil {
 		return "", err
@@ -32,7 +32,7 @@ func (f ChangelogFile) AddRelease(release Release) (string, error) {
 	md := release.Markdown()
 	log = strings.Replace(log, f.Marker, f.Marker+"\n\n"+md+"\n", 1)
 
-	return md, f.Write(log)
+	return md, f.Write(strings.TrimSpace(log) + "\n")
 }
 
 func (f ChangelogFile) Read() (string, error) {
