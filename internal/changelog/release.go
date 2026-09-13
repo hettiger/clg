@@ -7,20 +7,20 @@ import (
 )
 
 type Release struct {
-	Tag    string
-	Groups map[Type][]ChangelogEntry
+	tag    string
+	groups map[Type][]ChangelogEntry
 	time   time.Time
 }
 
 func NewRelease(tag string, unreleasedEntries []ChangelogEntry, time time.Time) (Release, error) {
 	supportedTypes := SupportedTypes()
 	release := Release{
-		Tag:    tag,
-		Groups: make(map[Type][]ChangelogEntry, len(supportedTypes)),
+		tag:    tag,
+		groups: make(map[Type][]ChangelogEntry, len(supportedTypes)),
 		time:   time,
 	}
 	for _, supportedType := range supportedTypes {
-		release.Groups[supportedType] = make([]ChangelogEntry, 0)
+		release.groups[supportedType] = make([]ChangelogEntry, 0)
 	}
 
 	for _, entry := range unreleasedEntries {
@@ -28,7 +28,7 @@ func NewRelease(tag string, unreleasedEntries []ChangelogEntry, time time.Time) 
 		if err != nil {
 			return Release{}, err
 		}
-		release.Groups[t] = append(release.Groups[t], entry)
+		release.groups[t] = append(release.groups[t], entry)
 	}
 
 	return release, nil
@@ -37,14 +37,14 @@ func NewRelease(tag string, unreleasedEntries []ChangelogEntry, time time.Time) 
 func (r Release) Markdown() string {
 	var result strings.Builder
 
-	fmt.Fprintf(&result, "## [%s] - %s", r.Tag, r.time.Format("2006-01-02"))
+	fmt.Fprintf(&result, "## [%s] - %s", r.tag, r.time.Format("2006-01-02"))
 
 	for _, groupType := range SupportedTypes() {
 		if groupType.Keyword == "ignore" {
 			continue
 		}
 
-		groupedEntries := r.Groups[groupType]
+		groupedEntries := r.groups[groupType]
 		if len(groupedEntries) == 0 {
 			continue
 		}
