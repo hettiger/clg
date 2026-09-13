@@ -119,6 +119,14 @@ func TestEntryStoreWrite(t *testing.T) {
 			},
 			wantPath: "changelogs/unreleased/2026-09-13-182541-added.yml",
 		},
+		{
+			name: "invalid entry",
+			entry: changelog.ChangelogEntry{
+				Title: "Simple Feature",
+				Type:  "invalid",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -128,6 +136,13 @@ func TestEntryStoreWrite(t *testing.T) {
 			s := changelog.NewEntryStore(root, now)
 
 			gotPath, err := s.Write(tt.entry)
+
+			if tt.wantErr {
+				require.Error(t, err)
+				require.Empty(t, gotPath)
+
+				return
+			}
 
 			require.NoError(t, err)
 			require.Contains(t, gotPath, tt.wantPath)

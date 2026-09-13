@@ -70,6 +70,10 @@ func (s EntryStore) UnreleasedEntryFiles() ([]ChangelogEntryFile, error) {
 }
 
 func (s EntryStore) Write(entry ChangelogEntry) (string, error) {
+	if err := entry.Validate(); err != nil {
+		return "", err
+	}
+
 	data, err := entry.YAMLData()
 	if err != nil {
 		return "", err
