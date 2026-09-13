@@ -2,7 +2,6 @@ package changelog_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/hettiger/clg/internal/changelog"
 	"github.com/stretchr/testify/require"
@@ -75,10 +74,6 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		},
 	}
 
-	now := func() time.Time {
-		return time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC)
-	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -97,6 +92,45 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 			require.NoError(t, gotErr)
 
 			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestEntryStoreWrite(t *testing.T) {
+	tests := []struct {
+		name     string
+		entry    changelog.ChangelogEntry
+		wantPath string
+		wantErr  bool
+	}{
+		{
+			name: "valid change",
+			entry: changelog.ChangelogEntry{
+				Title: "Simple Change",
+				Type:  "changed",
+			},
+			wantPath: "changelogs/unreleased/2026-09-13-182541-changed.yml",
+		},
+		{
+			name: "valid feature",
+			entry: changelog.ChangelogEntry{
+				Title: "Simple Feature",
+				Type:  "added",
+			},
+			wantPath: "changelogs/unreleased/2026-09-13-182541-added.yml",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			root := t.TempDir()
+			s := changelog.NewEntryStore(root, now)
+
+			gotPath, err := s.Write(tt.entry)
+
+			require.NoError(t, err)
+			require.Contains(t, gotPath, tt.wantPath)
 		})
 	}
 }
