@@ -51,7 +51,7 @@ func TestNewChangelogEntry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := os.ReadFile("testdata/" + tt.dataFile)
 			require.NoError(t, err)
-			got, gotErr := changelog.NewChangelogEntry(data)
+			got, gotErr := changelog.NewChangelogEntry(data, testTypeKeys())
 
 			if tt.wantErr {
 				require.Error(t, gotErr)
@@ -95,7 +95,7 @@ func TestEntryFilename(t *testing.T) {
 func TestEntryYAML(t *testing.T) {
 	dataValid, err := os.ReadFile("testdata/entry_valid.yml")
 	require.NoError(t, err)
-	entry, err := changelog.NewChangelogEntry(dataValid)
+	entry, err := changelog.NewChangelogEntry(dataValid, testTypeKeys())
 	require.NoError(t, err)
 
 	gotData, err := entry.YAMLData()

@@ -20,12 +20,12 @@ type ChangelogEntry struct {
 	Group  string `yaml:"group"`
 }
 
-func NewChangelogEntry(YAMLData []byte) (ChangelogEntry, error) {
+func NewChangelogEntry(YAMLData []byte, typeKeys []string) (ChangelogEntry, error) {
 	var entry ChangelogEntry
 	if err := yaml.Unmarshal(YAMLData, &entry); err != nil {
 		return entry, err
 	}
-	if err := entry.Validate(); err != nil {
+	if err := entry.Validate(typeKeys); err != nil {
 		return ChangelogEntry{}, err
 	}
 	return entry, nil
@@ -44,12 +44,16 @@ func (e ChangelogEntry) YAML() (string, error) {
 	return string(data), nil
 }
 
-func (e ChangelogEntry) Validate() error {
+func (e ChangelogEntry) Validate(typeKeys []string) error {
 	if err := validation.ValidateMin("title", e.Title, 1); err != nil {
 		return err
 	}
 
-	if err := validation.ValidateIn("type", e.Type, SupportedTypeKeywords()...); err != nil {
+	if err := validation.ValidateIn(
+		"type",
+		e.Type,
+		typeKeys...,
+	); err != nil {
 		return err
 	}
 

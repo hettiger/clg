@@ -8,14 +8,14 @@ import (
 )
 
 type App struct {
-	config              config.Config
-	now                 func() time.Time
-	rootDir             string
-	changelogEntryStore changelog.EntryStore
+	config     config.Config
+	now        func() time.Time
+	rootDir    string
+	entryStore changelog.EntryStore
 }
 
 func NewApp(config config.Config, now func() time.Time, root string, entryStore changelog.EntryStore) *App {
-	return &App{config: config, now: now, rootDir: root, changelogEntryStore: entryStore}
+	return &App{config: config, now: now, rootDir: root, entryStore: entryStore}
 }
 
 func (a *App) Execute() error {

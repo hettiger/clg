@@ -20,7 +20,7 @@ func NewShowCmd(app *App) *cobra.Command {
 }
 
 func showUnreleasedChangelogEntries(app *App) error {
-	unreleasedEntries, err := app.changelogEntryStore.UnreleasedEntries()
+	unreleasedEntries, err := app.entryStore.UnreleasedEntries()
 	if err != nil {
 		return err
 	}

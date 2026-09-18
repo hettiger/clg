@@ -78,7 +78,7 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := changelog.NewEntryStore(tt.fixtureDir, now)
+			s := changelog.NewEntryStore(tt.fixtureDir, now, testTypes())
 
 			got, gotErr := s.UnreleasedEntries()
 
@@ -133,7 +133,7 @@ func TestEntryStoreWrite(t *testing.T) {
 			t.Parallel()
 
 			root := t.TempDir()
-			s := changelog.NewEntryStore(root, now)
+			s := changelog.NewEntryStore(root, now, testTypes())
 
 			gotPath, err := s.Write(tt.entry)
 

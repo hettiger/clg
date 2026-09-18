@@ -25,7 +25,7 @@ func main() {
 		return time.Now().UTC()
 	}
 
-	entryStore := changelog.NewEntryStore(rootDir, now)
+	entryStore := changelog.NewEntryStore(rootDir, now, cfg.Types)
 
 	app := cmd.NewApp(cfg, now, rootDir, entryStore)
 

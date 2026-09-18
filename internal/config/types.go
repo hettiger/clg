@@ -1,7 +1,7 @@
 package config
 
-func defaultTypes() Types {
-	return Types{
+func defaultTypes() map[string]string {
+	return map[string]string{
 		"added":       "New Feature",
 		"fixed":       "Bug Fix",
 		"hotfix":      "Hotfix",

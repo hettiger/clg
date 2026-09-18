@@ -4,17 +4,21 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/hettiger/clg/internal/support"
 )
 
 type EntryStore struct {
-	rootDir string
-	now     func() time.Time
+	rootDir  string
+	now      func() time.Time
+	typeKeys []string
 }
 
-func NewEntryStore(root string, now func() time.Time) EntryStore {
+func NewEntryStore(root string, now func() time.Time, types map[string]string) EntryStore {
 	return EntryStore{
-		rootDir: root,
-		now:     now,
+		rootDir:  root,
+		now:      now,
+		typeKeys: support.SortedMapKeys(types),
 	}
 }
 
@@ -55,7 +59,7 @@ func (s EntryStore) UnreleasedEntryFiles() ([]ChangelogEntryFile, error) {
 			return nil, err
 		}
 
-		entry, err := NewChangelogEntry(data)
+		entry, err := NewChangelogEntry(data, s.typeKeys)
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +74,7 @@ func (s EntryStore) UnreleasedEntryFiles() ([]ChangelogEntryFile, error) {
 }
 
 func (s EntryStore) Write(entry ChangelogEntry) (string, error) {
-	if err := entry.Validate(); err != nil {
+	if err := entry.Validate(s.typeKeys); err != nil {
 		return "", err
 	}
 
