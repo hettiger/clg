@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -23,14 +21,27 @@ func main() {
 	viper.SetConfigName("clg")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(rootDir)
+	viper.SetDefault("Types", map[string]string{
+		"added":       "New Feature",
+		"fixed":       "Bug Fix",
+		"hotfix":      "Hotfix",
+		"changed":     "Feature Change",
+		"deprecated":  "New Deprecation",
+		"removed":     "Feature Removal",
+		"security":    "Security Fix",
+		"performance": "Performance Improvement",
+		"other":       "Other",
+		"ignore":      "No Changelog",
+	})
+	viper.SetDefault("Markdown.ListStyle", "-")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			log.Fatal(err)
+		}
+	}
 	if err := viper.Unmarshal(&config); err != nil {
 		log.Fatal(err)
 	}
-	jsonData, err := json.Marshal(config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(string(jsonData))
 
 	now := func() time.Time {
 		return time.Now().UTC()
