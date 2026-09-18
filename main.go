@@ -21,6 +21,7 @@ func main() {
 	viper.SetConfigName("clg")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(rootDir)
+	viper.SetDefault("Marker", "<!-- CLG -->")
 	viper.SetDefault("Types", map[string]string{
 		"added":       "New Feature",
 		"fixed":       "Bug Fix",

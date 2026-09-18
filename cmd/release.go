@@ -28,7 +28,7 @@ func NewReleaseCmd(app *App) *cobra.Command {
 		&state.marker,
 		"marker",
 		"m",
-		"<!-- CLG -->",
+		app.config.Marker,
 		"insertion marker for new releases",
 	)
 
