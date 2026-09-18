@@ -2,7 +2,7 @@ package config
 
 type Config struct {
 	Marker   string            `mapstructure:"marker"`
-	Groups   []string          `mapstructure:"groups"`
+	Groups   map[string]string `mapstructure:"groups"`
 	Types    map[string]string `mapstructure:"types"`
 	Markdown MarkdownConfig    `mapstructure:"markdown"`
 }

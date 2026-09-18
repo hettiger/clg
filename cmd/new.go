@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 
 	"charm.land/huh/v2"
@@ -12,8 +13,9 @@ import (
 )
 
 type newCmdState struct {
-	changeType string
-	message    string
+	changeGroup string
+	changeType  string
+	message     string
 }
 
 func NewNewCmd(app *App) *cobra.Command {
@@ -28,7 +30,26 @@ func NewNewCmd(app *App) *cobra.Command {
 		},
 	}
 
-	newCmd.Flags().StringVarP(&state.changeType, "type", "t", "", "type of change")
+	if len(app.config.Groups) > 0 {
+		groupKeys := support.SortedMapKeys(app.config.Groups)
+		newCmd.Flags().StringVarP(
+			&state.changeGroup,
+			"group",
+			"g",
+			"",
+			fmt.Sprintf("group of change (%s)", strings.Join(groupKeys, ", ")),
+		)
+	}
+
+	typeKeys := support.SortedMapKeys(app.config.Types)
+	newCmd.Flags().StringVarP(
+		&state.changeType,
+		"type",
+		"t",
+		"",
+		fmt.Sprintf("type of change (%s)", strings.Join(typeKeys, ", ")),
+	)
+
 	newCmd.Flags().StringVarP(&state.message, "message", "m", "", "changelog entry")
 
 	return newCmd
@@ -36,8 +57,37 @@ func NewNewCmd(app *App) *cobra.Command {
 
 func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	var groups []*huh.Group
+	groupKeys := support.SortedMapKeys(app.config.Groups)
 	typeKeys := support.SortedMapKeys(app.config.Types)
-	validateChangeType := newChangeTypeValidator(typeKeys)
+
+	validateChangeGroup := func(value string) error {
+		if len(groupKeys) == 0 {
+			return nil
+		}
+
+		return validation.ValidateIn("Group of change", value, groupKeys...)
+	}
+
+	validateChangeType := func(value string) error {
+		return validation.ValidateIn("Type of change", value, typeKeys...)
+	}
+
+	if len(groupKeys) > 0 && state.changeGroup == "" {
+		options := make([]huh.Option[string], 0, len(groupKeys))
+		for _, groupKey := range groupKeys {
+			options = append(options, huh.NewOption(app.config.Groups[groupKey], groupKey))
+		}
+
+		groups = append(groups, huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("Group of Change").
+				Options(options...).
+				Validate(validateChangeGroup).
+				Value(&state.changeGroup),
+		))
+	} else if err := validateChangeGroup(state.changeGroup); err != nil {
+		return err
+	}
 
 	if state.changeType == "" {
 		options := make([]huh.Option[string], 0, len(typeKeys))
@@ -85,6 +135,7 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	changelogEntry := changelog.ChangelogEntry{
 		Title: state.message,
 		Type:  state.changeType,
+		Group: state.changeGroup,
 	}
 	path, err := app.entryStore.Write(changelogEntry)
 	if err != nil {

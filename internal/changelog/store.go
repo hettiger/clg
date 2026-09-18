@@ -9,16 +9,18 @@ import (
 )
 
 type EntryStore struct {
-	rootDir  string
-	now      func() time.Time
-	typeKeys []string
+	rootDir   string
+	now       func() time.Time
+	groupKeys []string
+	typeKeys  []string
 }
 
-func NewEntryStore(root string, now func() time.Time, types map[string]string) EntryStore {
+func NewEntryStore(root string, now func() time.Time, groups, types map[string]string) EntryStore {
 	return EntryStore{
-		rootDir:  root,
-		now:      now,
-		typeKeys: support.SortedMapKeys(types),
+		rootDir:   root,
+		now:       now,
+		groupKeys: support.SortedMapKeys(groups),
+		typeKeys:  support.SortedMapKeys(types),
 	}
 }
 
@@ -59,7 +61,7 @@ func (s EntryStore) UnreleasedEntryFiles() ([]ChangelogEntryFile, error) {
 			return nil, err
 		}
 
-		entry, err := NewChangelogEntry(data, s.typeKeys)
+		entry, err := NewChangelogEntry(data, s.groupKeys, s.typeKeys)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +76,7 @@ func (s EntryStore) UnreleasedEntryFiles() ([]ChangelogEntryFile, error) {
 }
 
 func (s EntryStore) Write(entry ChangelogEntry) (string, error) {
-	if err := entry.Validate(s.typeKeys); err != nil {
+	if err := entry.Validate(s.groupKeys, s.typeKeys); err != nil {
 		return "", err
 	}
 

@@ -12,10 +12,11 @@ import (
 
 func TestNewChangelogEntry(t *testing.T) {
 	tests := []struct {
-		name     string
-		dataFile string
-		want     changelog.ChangelogEntry
-		wantErr  bool
+		name      string
+		dataFile  string
+		groupKeys []string
+		want      changelog.ChangelogEntry
+		wantErr   bool
 	}{
 		{
 			name:     "valid",
@@ -24,7 +25,19 @@ func TestNewChangelogEntry(t *testing.T) {
 				Title:  "Fake Title",
 				Type:   "added",
 				Author: "Fake Author",
-				Group:  "Fake Group",
+				Group:  "",
+			},
+			wantErr: false,
+		},
+		{
+			name:      "valid with group",
+			dataFile:  "entry_valid_group.yml",
+			groupKeys: testGroupKeys(),
+			want: changelog.ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "added",
+				Author: "Fake Author",
+				Group:  "front",
 			},
 			wantErr: false,
 		},
@@ -33,6 +46,19 @@ func TestNewChangelogEntry(t *testing.T) {
 			dataFile: "entry_invalid.yml",
 			want:     changelog.ChangelogEntry{},
 			wantErr:  true,
+		},
+		{
+			name:     "unsupported group without groups configured",
+			dataFile: "entry_unsupported_group.yml",
+			want:     changelog.ChangelogEntry{},
+			wantErr:  true,
+		},
+		{
+			name:      "unsupported group with groups configured",
+			groupKeys: testGroupKeys(),
+			dataFile:  "entry_unsupported_group.yml",
+			want:      changelog.ChangelogEntry{},
+			wantErr:   true,
 		},
 		{
 			name:     "unsupported type",
@@ -51,7 +77,7 @@ func TestNewChangelogEntry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := os.ReadFile("testdata/" + tt.dataFile)
 			require.NoError(t, err)
-			got, gotErr := changelog.NewChangelogEntry(data, testTypeKeys())
+			got, gotErr := changelog.NewChangelogEntry(data, tt.groupKeys, testTypeKeys())
 
 			if tt.wantErr {
 				require.Error(t, gotErr)
@@ -95,7 +121,7 @@ func TestEntryFilename(t *testing.T) {
 func TestEntryYAML(t *testing.T) {
 	dataValid, err := os.ReadFile("testdata/entry_valid.yml")
 	require.NoError(t, err)
-	entry, err := changelog.NewChangelogEntry(dataValid, testTypeKeys())
+	entry, err := changelog.NewChangelogEntry(dataValid, []string{}, testTypeKeys())
 	require.NoError(t, err)
 
 	gotData, err := entry.YAMLData()
