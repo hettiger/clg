@@ -78,11 +78,14 @@ func typeSection(keyword, headline string, entries ...ChangelogEntry) section {
 func TestAddEntryToMatchingSection(t *testing.T) {
 	tests := []struct {
 		name         string
-		groups       map[string]string
-		types        map[string]string
-		entryFixture string
+		sections     []section         // optional: if left empty it is built via groups and types
+		groups       map[string]string // used to build sections if empty and to validate ChangelogEntry if entryFixture is provided
+		types        map[string]string // used to build sections if empty and to validate ChangelogEntry if entryFixture is provided
+		entry        ChangelogEntry    // optional: use entry or entryFixture
+		entryFixture string            // optional: use entry or entryFixture
 		want         []section
 		wantErr      bool
+		wantErrMsg   string
 	}{
 		{
 			name:         "valid with group",
@@ -130,27 +133,110 @@ func TestAddEntryToMatchingSection(t *testing.T) {
 				typeSection("fixed", "Bug Fix"),
 			},
 		},
+		{
+			name:       "empty sections",
+			wantErr:    true,
+			wantErrMsg: "no sections available",
+		},
+		{
+			name:  "unsupported group",
+			types: testdata.Types(),
+			entry: ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "added",
+				Author: "Fake Author",
+				Group:  "front",
+			},
+			wantErr:    true,
+			wantErrMsg: `entry has group "front", but groups are not configured`,
+		},
+		{
+			name:   "unknown group",
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			entry: ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "added",
+				Author: "Fake Author",
+				Group:  "weekend",
+			},
+			wantErr:    true,
+			wantErrMsg: `unknown entry group: "weekend"`,
+		},
+		{
+			name:  "unknown type",
+			types: testdata.Types(),
+			entry: ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "special",
+				Author: "Fake Author",
+				Group:  "",
+			},
+			wantErr:    true,
+			wantErrMsg: `unknown entry type: "special"`,
+		},
+		{
+			name: "mixed section kinds",
+			sections: []section{
+				section{
+					kind: groupSectionKind,
+				},
+				section{
+					kind: typeSectionKind,
+				},
+			},
+			wantErr:    true,
+			wantErrMsg: "sections must have the same kind",
+		},
+		{
+			name: "nested mixed section kinds",
+			sections: []section{
+				section{
+					kind: groupSectionKind,
+					children: []section{
+						section{
+							kind: groupSectionKind,
+						},
+						section{
+							kind: typeSectionKind,
+						},
+					},
+				},
+			},
+			wantErr:    true,
+			wantErrMsg: "sections must have the same kind",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			entryFixtureData, err := os.ReadFile(filepath.Join("testdata", tt.entryFixture))
-			require.NoError(t, err)
-			groupKeys := support.SortedMapKeys(tt.groups)
-			typeKeys := support.SortedMapKeys(tt.types)
-			entry, err := NewChangelogEntry(entryFixtureData, groupKeys, typeKeys)
-			require.NoError(t, err)
-			sections := buildSections(tt.groups, tt.types)
+			entry := tt.entry
+
+			if tt.entryFixture != "" {
+				entryFixtureData, err := os.ReadFile(filepath.Join("testdata", tt.entryFixture))
+				require.NoError(t, err)
+				groupKeys := support.SortedMapKeys(tt.groups)
+				typeKeys := support.SortedMapKeys(tt.types)
+				entry, err = NewChangelogEntry(entryFixtureData, groupKeys, typeKeys)
+				require.NoError(t, err)
+			}
+
+			sections := tt.sections
+
+			if len(sections) == 0 {
+				sections = buildSections(tt.groups, tt.types)
+			}
 
 			gotErr := addEntryToMatchingSection(sections, entry)
 
 			if tt.wantErr {
 				require.Error(t, gotErr)
-			} else {
-				require.NoError(t, gotErr)
+				require.EqualError(t, gotErr, tt.wantErrMsg)
+				return
 			}
 
+			require.NoError(t, gotErr)
 			require.Equal(t, tt.want, sections)
 		})
 	}
