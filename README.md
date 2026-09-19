@@ -5,7 +5,6 @@ Instead of editing the changelog during development, record each change as a
 YAML file and turn all unreleased entries into a dated release when you publish.
 
 > **Warning:** This project is work in progress. Use at your own risk. APIs might change.
-> Not all features are fully implemented yet (authors, groups) but the app is already usable.
 > The docs are 100% AI-generated. No releases published yet.
 
 ## How it works
@@ -15,14 +14,15 @@ YAML file and turn all unreleased entries into a dated release when you publish.
 ```text
 .
 ├── CHANGELOG.md
+├── clg.yml                  # optional configuration
 └── changelogs/
     └── unreleased/
         └── 2026-09-06-142530-added.yml
 ```
 
 The files in `changelogs/unreleased/` are temporary release notes. `clg release`
-groups them by type, inserts the resulting Markdown into `CHANGELOG.md`, and
-removes the source files.
+groups them by type—or by group and then type when groups are configured—inserts
+the resulting Markdown into `CHANGELOG.md`, and removes the source files.
 
 ## Installation
 
@@ -42,13 +42,30 @@ go build -o clg .
 
 ## Quick start
 
-Add the insertion marker to `CHANGELOG.md` once, usually near the top:
+Add the insertion marker to `CHANGELOG.md` once, usually near the top. The
+default marker is `<!-- CLG -->`:
 
 ```md
 <!-- CLG -->
 ```
 
-Record a change. With no flags, `clg new` asks for the type and message:
+Optionally configure groups, custom labels, or a different marker in `clg.yml`:
+
+```yaml
+marker: "<!-- CLG -->"
+groups:
+  front: Frontend
+  back: Backend
+types:
+  added: New Feature
+  fixed: Bug Fix
+```
+
+When `groups` is configured, every entry must specify one of its keys and
+releases are rendered with group headings containing type headings.
+
+Record a change. With no flags, `clg new` asks for the configured group (if any),
+type, and message:
 
 ```sh
 clg new
@@ -58,7 +75,7 @@ For scripts or a faster workflow, provide both values directly:
 
 ```sh
 clg new --type added --message "Support exporting reports"
-clg new -t fixed -m "Prevent duplicate notifications"
+clg new -g back -t fixed -m "Prevent duplicate notifications"
 ```
 
 Review the unreleased entries:
@@ -87,6 +104,16 @@ This adds a section like the following immediately after `<!-- CLG -->`:
 - Prevent duplicate notifications
 ```
 
+With groups configured, the release uses one additional heading level:
+
+```md
+### Backend
+
+#### Bug Fix (1 change)
+
+- Prevent duplicate notifications
+```
+
 The release date is the current UTC date.
 
 ## Commands
@@ -101,10 +128,11 @@ clg new [flags]
 
 | Flag | Description |
 | --- | --- |
-| `-t, --type` | Change type. If omitted, choose from an interactive list. |
+| `-g, --group` | Configured group key. If omitted, choose from an interactive list when groups are configured. |
+| `-t, --type` | Configured change type. If omitted, choose from an interactive list. |
 | `-m, --message` | Entry text. If omitted, enter it interactively. |
 
-Both flags can be supplied together, which makes the command non-interactive.
+The flags can be supplied together, which makes the command non-interactive.
 The generated filename contains the UTC timestamp and type, for example
 `2026-09-06-142530-fixed.yml`.
 
@@ -116,8 +144,9 @@ Display all valid entries that have not yet been released:
 clg show
 ```
 
-The output includes the type, message, and optional author. If there are no
-entries, `clg` reports that there is nothing to show.
+The output includes the type, message, and optional author. Group values are
+stored in entries and used when generating a release. If there are no entries,
+`clg` reports that there is nothing to show.
 
 ### `clg release [tag]`
 
@@ -130,7 +159,7 @@ clg release v1.2.0
 
 | Flag | Default | Description |
 | --- | --- | --- |
-| `-m, --marker` | `<!-- CLG -->` | Text where the new release is inserted. |
+| `-m, --marker` | configured marker or `<!-- CLG -->` | Text where the new release is inserted. |
 
 The marker must already exist in `CHANGELOG.md`. To use a different marker:
 
@@ -176,36 +205,58 @@ The following type keywords are supported:
 
 The heading is used when `clg release` groups entries.
 
-## Entry format
+## Configuration
 
-Each entry is a YAML document. `clg new` writes the required `title` and
-`type` fields:
+Configuration is loaded from an optional `clg.yml` in the current working
+directory. The defaults are:
 
 ```yaml
-title: Support exporting reports
-type: added
+marker: "<!-- CLG -->"
+types:
+  added: New Feature
+  fixed: Bug Fix
+  hotfix: Hotfix
+  changed: Feature Change
+  deprecated: New Deprecation
+  removed: Feature Removal
+  security: Security Fix
+  performance: Performance Improvement
+  other: Other
 ```
 
-Optional `author` and `group` fields are supported when entries are created or
-edited manually:
+Use `groups` to enable grouped releases. Group keys are used in entry files and
+CLI flags; their values are the headings shown in generated Markdown:
+
+```yaml
+groups:
+  front: Frontend
+  back: Backend
+```
+
+## Entry format
+
+Each entry is a YAML document. `clg new` writes the required `title` and `type`
+fields, plus `group` when groups are configured:
 
 ```yaml
 title: Improve report permissions
 type: changed
+group: back
 author: Jane Doe
-group: Reporting
 ```
 
-Every YAML file in `changelogs/unreleased/` must have a non-empty `title` and a
-supported `type`; invalid files prevent commands that read unreleased entries
-from completing.
+The `author` field is optional and is displayed by `clg show`; it is not set by
+`clg new`. Every YAML file in `changelogs/unreleased/` must have a non-empty
+`title`, a configured `type`, and—when groups are configured—a configured
+`group`. Invalid files prevent commands that read unreleased entries from
+completing.
 
 ## Typical release workflow
 
 ```sh
 # During development
-clg new -t added -m "Add CSV export"
-clg new -t fixed -m "Handle empty report filters"
+clg new -g back -t added -m "Add CSV export"
+clg new -g front -t fixed -m "Handle empty report filters"
 
 # Before publishing
 clg show
