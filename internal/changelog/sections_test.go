@@ -10,6 +10,39 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestSectionKindString(t *testing.T) {
+	tests := []struct {
+		name string
+		kind sectionKind
+		want string
+	}{
+		{
+			name: "group",
+			kind: 0,
+			want: "group",
+		},
+		{
+			name: "type",
+			kind: 1,
+			want: "type",
+		},
+		{
+			name: "unknown",
+			kind: 3,
+			want: "unknown (3)",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := tt.kind.String()
+
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestBuildSections(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -205,6 +238,16 @@ func TestAddEntryToMatchingSection(t *testing.T) {
 			},
 			wantErr:    true,
 			wantErrMsg: "sections must have the same kind",
+		},
+		{
+			name: "unsupported section kind",
+			sections: []section{
+				section{
+					kind: 4,
+				},
+			},
+			wantErr:    true,
+			wantErrMsg: "unsupported section kind: unknown (4)",
 		},
 	}
 	for _, tt := range tests {
