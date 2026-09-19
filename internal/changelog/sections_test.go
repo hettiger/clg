@@ -1,9 +1,9 @@
-package changelog_test
+package changelog
 
 import (
 	"testing"
 
-	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/testdata"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,12 +12,12 @@ func TestSections(t *testing.T) {
 		name   string
 		groups map[string]string
 		types  map[string]string
-		want   []changelog.Section
+		want   []section
 	}{
 		{
 			name:  "without groups",
-			types: testTypes(),
-			want: []changelog.Section{
+			types: testdata.Types(),
+			want: []section{
 				typeSection("added", "New Feature"),
 				typeSection("changed", "Feature Change"),
 				typeSection("fixed", "Bug Fix"),
@@ -25,13 +25,13 @@ func TestSections(t *testing.T) {
 		},
 		{
 			name:   "with groups",
-			groups: testGroups(),
-			types:  testTypes(),
-			want: []changelog.Section{
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			want: []section{
 				groupSection(
 					"back",
 					"Backend",
-					[]changelog.Section{
+					[]section{
 						typeSection("added", "New Feature"),
 						typeSection("changed", "Feature Change"),
 						typeSection("fixed", "Bug Fix"),
@@ -40,7 +40,7 @@ func TestSections(t *testing.T) {
 				groupSection(
 					"front",
 					"Frontend",
-					[]changelog.Section{
+					[]section{
 						typeSection("added", "New Feature"),
 						typeSection("changed", "Feature Change"),
 						typeSection("fixed", "Bug Fix"),
@@ -53,27 +53,17 @@ func TestSections(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := changelog.Sections(tt.groups, tt.types)
+			got := buildSections(tt.groups, tt.types)
 
 			require.Equal(t, tt.want, got)
 		})
 	}
 }
 
-func groupSection(keyword, headline string, children []changelog.Section) changelog.Section {
-	return changelog.Section{
-		Kind:     changelog.GroupSectionKind,
-		Keyword:  keyword,
-		Headline: headline,
-		Children: children,
-	}
+func groupSection(keyword, headline string, children []section) section {
+	section := newGroupSection(keyword, headline)
+	section.children = children
+	return section
 }
 
-func typeSection(keyword, headline string) changelog.Section {
-	return changelog.Section{
-		Kind:     changelog.TypeSectionKind,
-		Keyword:  keyword,
-		Headline: headline,
-		Entries:  make([]changelog.ChangelogEntry, 0),
-	}
-}
+var typeSection = newTypeSection

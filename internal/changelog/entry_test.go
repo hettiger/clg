@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/testdata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +33,7 @@ func TestNewChangelogEntry(t *testing.T) {
 		{
 			name:      "valid with group",
 			dataFile:  "entry_valid_group.yml",
-			groupKeys: testGroupKeys(),
+			groupKeys: testdata.GroupKeys(),
 			want: changelog.ChangelogEntry{
 				Title:  "Fake Title",
 				Type:   "added",
@@ -55,7 +56,7 @@ func TestNewChangelogEntry(t *testing.T) {
 		},
 		{
 			name:      "unsupported group with groups configured",
-			groupKeys: testGroupKeys(),
+			groupKeys: testdata.GroupKeys(),
 			dataFile:  "entry_unsupported_group.yml",
 			want:      changelog.ChangelogEntry{},
 			wantErr:   true,
@@ -77,7 +78,7 @@ func TestNewChangelogEntry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := os.ReadFile("testdata/" + tt.dataFile)
 			require.NoError(t, err)
-			got, gotErr := changelog.NewChangelogEntry(data, tt.groupKeys, testTypeKeys())
+			got, gotErr := changelog.NewChangelogEntry(data, tt.groupKeys, testdata.TypeKeys())
 
 			if tt.wantErr {
 				require.Error(t, gotErr)
@@ -121,7 +122,7 @@ func TestEntryFilename(t *testing.T) {
 func TestEntryYAML(t *testing.T) {
 	dataValid, err := os.ReadFile("testdata/entry_valid.yml")
 	require.NoError(t, err)
-	entry, err := changelog.NewChangelogEntry(dataValid, []string{}, testTypeKeys())
+	entry, err := changelog.NewChangelogEntry(dataValid, []string{}, testdata.TypeKeys())
 	require.NoError(t, err)
 
 	gotData, err := entry.YAMLData()
