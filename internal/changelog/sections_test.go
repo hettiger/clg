@@ -1,11 +1,8 @@
 package changelog
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
-	"github.com/hettiger/clg/internal/support"
 	"github.com/hettiger/clg/internal/testdata"
 	"github.com/stretchr/testify/require"
 )
@@ -110,21 +107,25 @@ func typeSection(keyword, headline string, entries ...ChangelogEntry) section {
 
 func TestAddEntryToMatchingSection(t *testing.T) {
 	tests := []struct {
-		name         string
-		sections     []section         // optional: if left empty it is built via groups and types
-		groups       map[string]string // used to build sections if empty and to validate ChangelogEntry if entryFixture is provided
-		types        map[string]string // used to build sections if empty and to validate ChangelogEntry if entryFixture is provided
-		entry        ChangelogEntry    // optional: use entry or entryFixture
-		entryFixture string            // optional: use entry or entryFixture
-		want         []section
-		wantErr      bool
-		wantErrMsg   string
+		name       string
+		sections   []section         // optional: if left empty it is built via groups and types
+		groups     map[string]string // used to build sections if empty
+		types      map[string]string // used to build sections if empty
+		entry      ChangelogEntry
+		want       []section
+		wantErr    bool
+		wantErrMsg string
 	}{
 		{
-			name:         "valid with group",
-			groups:       testdata.Groups(),
-			types:        testdata.Types(),
-			entryFixture: "entry_valid_group.yml",
+			name:   "valid with group",
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			entry: ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "added",
+				Author: "Fake Author",
+				Group:  "front",
+			},
 			want: []section{
 				groupSection(
 					"back",
@@ -152,9 +153,14 @@ func TestAddEntryToMatchingSection(t *testing.T) {
 			},
 		},
 		{
-			name:         "valid without group",
-			types:        testdata.Types(),
-			entryFixture: "entry_valid.yml",
+			name:  "valid without group",
+			types: testdata.Types(),
+			entry: ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "added",
+				Author: "Fake Author",
+				Group:  "",
+			},
 			want: []section{
 				typeSection("added", "New Feature", ChangelogEntry{
 					Title:  "Fake Title",
@@ -254,24 +260,12 @@ func TestAddEntryToMatchingSection(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			entry := tt.entry
-
-			if tt.entryFixture != "" {
-				entryFixtureData, err := os.ReadFile(filepath.Join("testdata", tt.entryFixture))
-				require.NoError(t, err)
-				groupKeys := support.SortedMapKeys(tt.groups)
-				typeKeys := support.SortedMapKeys(tt.types)
-				entry, err = NewChangelogEntry(entryFixtureData, groupKeys, typeKeys)
-				require.NoError(t, err)
-			}
-
 			sections := tt.sections
-
 			if len(sections) == 0 {
 				sections = buildSections(tt.groups, tt.types)
 			}
 
-			gotErr := addEntryToMatchingSection(sections, entry)
+			gotErr := addEntryToMatchingSection(sections, tt.entry)
 
 			if tt.wantErr {
 				require.Error(t, gotErr)
