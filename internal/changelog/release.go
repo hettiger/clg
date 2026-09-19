@@ -48,10 +48,6 @@ func (r Release) Markdown() string {
 	fmt.Fprintf(&result, "## [%s] - %s", r.tag, r.time.Format("2006-01-02"))
 
 	for _, typeKey := range r.typeKeys {
-		if typeKey == "ignore" {
-			continue
-		}
-
 		groupLabel := r.types[typeKey]
 		groupedEntries := r.groups[typeKey]
 

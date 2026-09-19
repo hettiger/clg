@@ -11,6 +11,5 @@ func defaultTypes() map[string]string {
 		"security":    "Security Fix",
 		"performance": "Performance Improvement",
 		"other":       "Other",
-		"ignore":      "No Changelog",
 	}
 }

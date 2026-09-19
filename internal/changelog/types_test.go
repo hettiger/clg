@@ -11,6 +11,5 @@ func testTypes() map[string]string {
 		"added":   "New Feature",
 		"fixed":   "Bug Fix",
 		"changed": "Feature Change",
-		"ignore":  "No Changelog",
 	}
 }

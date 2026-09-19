@@ -138,9 +138,7 @@ The marker must already exist in `CHANGELOG.md`. To use a different marker:
 clg release v1.2.0 --marker "<!-- RELEASES -->"
 ```
 
-If there are no unreleased entries, the command leaves the changelog
-unchanged. Entries with the `ignore` type are accepted as temporary notes but
-are not included in the generated release.
+If there are no unreleased entries, the command leaves the changelog unchanged.
 
 ### `clg clean`
 
@@ -175,10 +173,8 @@ The following type keywords are supported:
 | `security` | Security Fix |
 | `performance` | Performance Improvement |
 | `other` | Other |
-| `ignore` | No Changelog |
 
-The heading is used when `clg release` groups entries. The `ignore` type is
-deliberately omitted from release Markdown.
+The heading is used when `clg release` groups entries.
 
 ## Entry format
 

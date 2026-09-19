@@ -114,30 +114,6 @@ func TestReleaseMarkdown(t *testing.T) {
 			wantFixture: "release_groups.md",
 		},
 		{
-			name: "ignored",
-			tag:  "v0.3.0",
-			unreleasedEntries: []changelog.ChangelogEntry{
-				{
-					Title: "First Change",
-					Type:  "changed",
-				},
-				{
-					Title: "Simple Bug Fix",
-					Type:  "fixed",
-				},
-				{
-					Title: "Ignored Change",
-					Type:  "ignore",
-				},
-				{
-					Title: "Second Change",
-					Type:  "changed",
-				},
-			},
-			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture: "release_ignored.md",
-		},
-		{
 			name:              "empty",
 			tag:               "v0.3.1",
 			unreleasedEntries: []changelog.ChangelogEntry{},
