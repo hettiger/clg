@@ -7,6 +7,7 @@ import (
 
 	"github.com/hettiger/clg/cmd"
 	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/config"
 )
 
 func main() {
@@ -15,13 +16,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	cfg, err := config.Load(rootDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	now := func() time.Time {
 		return time.Now().UTC()
 	}
 
-	entryStore := changelog.NewEntryStore(rootDir, now)
+	entryStore := changelog.NewEntryStore(rootDir, now, cfg.Groups, cfg.Types)
 
-	app := cmd.NewApp(now, rootDir, entryStore)
+	app := cmd.NewApp(cfg, now, rootDir, entryStore)
 
 	if err := app.Execute(); err != nil {
 		log.Fatal(err)

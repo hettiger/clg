@@ -1,18 +1,21 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 
 	"charm.land/huh/v2"
 	"github.com/hettiger/clg/cmd/output"
 	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/support"
 	"github.com/hettiger/clg/internal/validation"
 	"github.com/spf13/cobra"
 )
 
 type newCmdState struct {
-	changeType string
-	message    string
+	changeGroup string
+	changeType  string
+	message     string
 }
 
 func NewNewCmd(app *App) *cobra.Command {
@@ -27,19 +30,70 @@ func NewNewCmd(app *App) *cobra.Command {
 		},
 	}
 
-	newCmd.Flags().StringVarP(&state.changeType, "type", "t", "", "type of change")
+	if len(app.config.Groups) > 0 {
+		groupKeys := support.SortedMapKeys(app.config.Groups)
+		newCmd.Flags().StringVarP(
+			&state.changeGroup,
+			"group",
+			"g",
+			"",
+			fmt.Sprintf("group of change (%s)", strings.Join(groupKeys, ", ")),
+		)
+	}
+
+	typeKeys := support.SortedMapKeys(app.config.Types)
+	newCmd.Flags().StringVarP(
+		&state.changeType,
+		"type",
+		"t",
+		"",
+		fmt.Sprintf("type of change (%s)", strings.Join(typeKeys, ", ")),
+	)
+
 	newCmd.Flags().StringVarP(&state.message, "message", "m", "", "changelog entry")
 
 	return newCmd
 }
 
 func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
+	groupKeys := support.SortedMapKeys(app.config.Groups)
+	typeKeys := support.SortedMapKeys(app.config.Types)
+
+	validateChangeGroup := func(value string) error {
+		if len(groupKeys) == 0 {
+			return nil
+		}
+
+		return validation.ValidateIn("Group of change", value, groupKeys...)
+	}
+
+	validateChangeType := func(value string) error {
+		return validation.ValidateIn("Type of change", value, typeKeys...)
+	}
+
 	var groups []*huh.Group
 
+	if len(groupKeys) > 0 && state.changeGroup == "" {
+		options := make([]huh.Option[string], 0, len(groupKeys))
+		for _, groupKey := range groupKeys {
+			options = append(options, huh.NewOption(app.config.Groups[groupKey], groupKey))
+		}
+
+		groups = append(groups, huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("Group of Change").
+				Options(options...).
+				Validate(validateChangeGroup).
+				Value(&state.changeGroup),
+		))
+	} else if err := validateChangeGroup(state.changeGroup); err != nil {
+		return err
+	}
+
 	if state.changeType == "" {
-		options := make([]huh.Option[string], len(changelog.SupportedTypes()))
-		for i, t := range changelog.SupportedTypes() {
-			options[i] = huh.NewOption(t.Label, t.Keyword)
+		options := make([]huh.Option[string], 0, len(typeKeys))
+		for _, typeKey := range typeKeys {
+			options = append(options, huh.NewOption(app.config.Types[typeKey], typeKey))
 		}
 
 		groups = append(groups, huh.NewGroup(
@@ -82,8 +136,9 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	changelogEntry := changelog.ChangelogEntry{
 		Title: state.message,
 		Type:  state.changeType,
+		Group: state.changeGroup,
 	}
-	path, err := app.changelogEntryStore.Write(changelogEntry)
+	path, err := app.entryStore.Write(changelogEntry)
 	if err != nil {
 		return err
 	}
@@ -98,14 +153,6 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	cmd.Print(yaml)
 
 	return nil
-}
-
-func validateChangeType(value string) error {
-	return validation.ValidateIn(
-		"Type of change",
-		value,
-		changelog.SupportedTypeKeywords()...,
-	)
 }
 
 func validateTrimmedMessage(value string) error {

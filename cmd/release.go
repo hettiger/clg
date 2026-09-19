@@ -28,7 +28,7 @@ func NewReleaseCmd(app *App) *cobra.Command {
 		&state.marker,
 		"marker",
 		"m",
-		"<!-- CLG -->",
+		app.config.Marker,
 		"insertion marker for new releases",
 	)
 
@@ -36,7 +36,7 @@ func NewReleaseCmd(app *App) *cobra.Command {
 }
 
 func addRelease(app *App, args []string, state *releaseCmdState) error {
-	entryFiles, err := app.changelogEntryStore.UnreleasedEntryFiles()
+	entryFiles, err := app.entryStore.UnreleasedEntryFiles()
 	if err != nil {
 		return err
 	}
@@ -45,12 +45,12 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 		return output.PrintSuccess("No changelog entries. Nothing to release.")
 	}
 
-	unreleasedEntries, err := app.changelogEntryStore.UnreleasedEntries()
+	unreleasedEntries, err := app.entryStore.UnreleasedEntries()
 	if err != nil {
 		return err
 	}
 
-	release, err := changelog.NewRelease(args[0], unreleasedEntries, app.now())
+	release, err := changelog.NewRelease(args[0], unreleasedEntries, app.now(), app.config.Types)
 	if err != nil {
 		return err
 	}

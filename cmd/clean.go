@@ -30,7 +30,7 @@ func NewCleanCmd(app *App) *cobra.Command {
 }
 
 func removeUnreleasedChangelogEntries(app *App, state *cleanCmdState) error {
-	files, err := app.changelogEntryStore.UnreleasedEntryFiles()
+	files, err := app.entryStore.UnreleasedEntryFiles()
 	if err != nil {
 		return err
 	}

@@ -42,7 +42,7 @@ func TestNewRelease(t *testing.T) {
 			t.Parallel()
 
 			tag := "v0.0.0"
-			got, gotErr := changelog.NewRelease(tag, tt.unreleasedEntries, time.Now())
+			got, gotErr := changelog.NewRelease(tag, tt.unreleasedEntries, time.Now(), testTypes())
 
 			if tt.wantErrMsg != "" {
 				require.EqualError(t, gotErr, tt.wantErrMsg)
@@ -114,30 +114,6 @@ func TestReleaseMarkdown(t *testing.T) {
 			wantFixture: "release_groups.md",
 		},
 		{
-			name: "ignored",
-			tag:  "v0.3.0",
-			unreleasedEntries: []changelog.ChangelogEntry{
-				{
-					Title: "First Change",
-					Type:  "changed",
-				},
-				{
-					Title: "Simple Bug Fix",
-					Type:  "fixed",
-				},
-				{
-					Title: "Ignored Change",
-					Type:  "ignore",
-				},
-				{
-					Title: "Second Change",
-					Type:  "changed",
-				},
-			},
-			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture: "release_ignored.md",
-		},
-		{
 			name:              "empty",
 			tag:               "v0.3.1",
 			unreleasedEntries: []changelog.ChangelogEntry{},
@@ -149,7 +125,7 @@ func TestReleaseMarkdown(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			release, err := changelog.NewRelease(tt.tag, tt.unreleasedEntries, tt.time)
+			release, err := changelog.NewRelease(tt.tag, tt.unreleasedEntries, tt.time, testTypes())
 			require.NoError(t, err)
 			wantData, err := os.ReadFile(filepath.Join("testdata", tt.wantFixture))
 			require.NoError(t, err)
