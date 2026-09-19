@@ -50,7 +50,13 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 		return err
 	}
 
-	release, err := changelog.NewRelease(args[0], unreleasedEntries, app.now(), app.config.Types)
+	release, err := changelog.NewRelease(
+		args[0],
+		unreleasedEntries,
+		app.now(),
+		app.config.Groups,
+		app.config.Types,
+	)
 	if err != nil {
 		return err
 	}

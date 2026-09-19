@@ -105,6 +105,10 @@ func addEntryToMatchingSection(sections []section, entry ChangelogEntry) error {
 		return addEntryToMatchingTypeSection(sections, entry)
 
 	case groupSectionKind:
+		if entry.Group == "" {
+			return errors.New("missing entry group")
+		}
+
 		for i := range sections {
 			section := &sections[i]
 
@@ -129,6 +133,10 @@ func addEntryToMatchingTypeSection(sections []section, entry ChangelogEntry) err
 
 	if sections[0].kind != typeSectionKind {
 		return fmt.Errorf("unexpected section kind: %s", sections[0].kind)
+	}
+
+	if entry.Type == "" {
+		return errors.New("missing entry type")
 	}
 
 	for i := range sections {

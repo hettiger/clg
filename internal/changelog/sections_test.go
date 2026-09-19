@@ -231,16 +231,27 @@ func TestAddEntryToMatchingSection(t *testing.T) {
 			name: "nested mixed section kinds",
 			sections: []section{
 				section{
-					kind: groupSectionKind,
+					kind:    groupSectionKind,
+					keyword: "front",
 					children: []section{
 						section{
-							kind: groupSectionKind,
+							kind:    groupSectionKind,
+							keyword: "back",
 						},
 						section{
-							kind: typeSectionKind,
+							kind:    typeSectionKind,
+							keyword: "changed",
 						},
 					},
 				},
+			},
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			entry: ChangelogEntry{
+				Title:  "Fake Title",
+				Type:   "changed",
+				Author: "Fake Author",
+				Group:  "front",
 			},
 			wantErr:    true,
 			wantErrMsg: "sections must have the same kind",
