@@ -8,18 +8,23 @@ import (
 	"time"
 
 	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/testdata"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewRelease(t *testing.T) {
 	tests := []struct {
-		name              string
-		unreleasedEntries []changelog.ChangelogEntry
-		wantErrMsg        string
+		name       string
+		groups     map[string]string
+		types      map[string]string
+		entries    []changelog.ChangelogEntry
+		wantErrMsg string
 	}{
 		{
-			name: "valid type",
-			unreleasedEntries: []changelog.ChangelogEntry{
+			name:   "valid type",
+			groups: map[string]string{},
+			types:  testdata.Types(),
+			entries: []changelog.ChangelogEntry{
 				{
 					Title: "Simple Change",
 					Type:  "changed",
@@ -27,14 +32,66 @@ func TestNewRelease(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid type",
-			unreleasedEntries: []changelog.ChangelogEntry{
+			name:   "invalid type",
+			groups: map[string]string{},
+			types:  testdata.Types(),
+			entries: []changelog.ChangelogEntry{
 				{
 					Title: "Simple Change",
 					Type:  "invalid",
 				},
 			},
-			wantErrMsg: "Unknown type keyword provided (invalid)",
+			wantErrMsg: `unknown entry type: "invalid"`,
+		},
+		{
+			name:   "empty type",
+			groups: map[string]string{},
+			types:  testdata.Types(),
+			entries: []changelog.ChangelogEntry{
+				{
+					Title: "Simple Change",
+					Type:  "",
+				},
+			},
+			wantErrMsg: `missing entry type`,
+		},
+		{
+			name:   "valid group",
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			entries: []changelog.ChangelogEntry{
+				{
+					Title: "Simple Change",
+					Type:  "changed",
+					Group: "front",
+				},
+			},
+		},
+		{
+			name:   "invalid group",
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			entries: []changelog.ChangelogEntry{
+				{
+					Title: "Simple Change",
+					Type:  "changed",
+					Group: "invalid",
+				},
+			},
+			wantErrMsg: `unknown entry group: "invalid"`,
+		},
+		{
+			name:   "empty group",
+			groups: testdata.Groups(),
+			types:  testdata.Types(),
+			entries: []changelog.ChangelogEntry{
+				{
+					Title: "Simple Change",
+					Type:  "changed",
+					Group: "",
+				},
+			},
+			wantErrMsg: `missing entry group`,
 		},
 	}
 	for _, tt := range tests {
@@ -42,7 +99,13 @@ func TestNewRelease(t *testing.T) {
 			t.Parallel()
 
 			tag := "v0.0.0"
-			got, gotErr := changelog.NewRelease(tag, tt.unreleasedEntries, time.Now(), testTypes())
+			got, gotErr := changelog.NewRelease(
+				tag,
+				tt.entries,
+				time.Now(),
+				tt.groups,
+				tt.types,
+			)
 
 			if tt.wantErrMsg != "" {
 				require.EqualError(t, gotErr, tt.wantErrMsg)
@@ -59,28 +122,31 @@ func TestNewRelease(t *testing.T) {
 
 func TestReleaseMarkdown(t *testing.T) {
 	tests := []struct {
-		name              string
-		tag               string
-		unreleasedEntries []changelog.ChangelogEntry
-		time              time.Time
-		wantFixture       string
+		name        string
+		tag         string
+		entries     []changelog.ChangelogEntry
+		groups      map[string]string
+		types       map[string]string
+		time        time.Time
+		wantFixture string
 	}{
 		{
 			name: "single change",
 			tag:  "v0.0.0",
-			unreleasedEntries: []changelog.ChangelogEntry{
+			entries: []changelog.ChangelogEntry{
 				{
 					Title: "Simple Change",
 					Type:  "changed",
 				},
 			},
+			types:       testdata.Types(),
 			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
 			wantFixture: "release_single_change.md",
 		},
 		{
 			name: "multiple changes",
 			tag:  "v0.1.0",
-			unreleasedEntries: []changelog.ChangelogEntry{
+			entries: []changelog.ChangelogEntry{
 				{
 					Title: "First Change",
 					Type:  "changed",
@@ -90,13 +156,14 @@ func TestReleaseMarkdown(t *testing.T) {
 					Type:  "changed",
 				},
 			},
+			types:       testdata.Types(),
 			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
 			wantFixture: "release_multiple_changes.md",
 		},
 		{
-			name: "groups",
+			name: "type sections",
 			tag:  "v0.2.0",
-			unreleasedEntries: []changelog.ChangelogEntry{
+			entries: []changelog.ChangelogEntry{
 				{
 					Title: "First Change",
 					Type:  "changed",
@@ -110,22 +177,76 @@ func TestReleaseMarkdown(t *testing.T) {
 					Type:  "changed",
 				},
 			},
+			types:       testdata.Types(),
+			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture: "release_type_sections.md",
+		},
+		{
+			name:        "empty",
+			tag:         "v0.3.1",
+			entries:     []changelog.ChangelogEntry{},
+			types:       testdata.Types(),
+			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture: "release_empty.md",
+		},
+		{
+			name: "groups",
+			tag:  "v0.4.0",
+			entries: []changelog.ChangelogEntry{
+				{
+					Title: "First Change",
+					Type:  "changed",
+					Group: "front",
+				},
+				{
+					Title: "Important Bug Fix",
+					Type:  "fixed",
+					Group: "back",
+				},
+				{
+					Title: "Simple Bug Fix",
+					Type:  "fixed",
+					Group: "front",
+				},
+				{
+					Title: "Second Change",
+					Type:  "changed",
+					Group: "front",
+				},
+			},
+			groups:      testdata.Groups(),
+			types:       testdata.Types(),
 			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
 			wantFixture: "release_groups.md",
 		},
+
 		{
-			name:              "empty",
-			tag:               "v0.3.1",
-			unreleasedEntries: []changelog.ChangelogEntry{},
-			time:              time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture:       "release_empty.md",
+			name: "groups single change",
+			tag:  "v0.5.0",
+			entries: []changelog.ChangelogEntry{
+				{
+					Title: "Single Change",
+					Type:  "changed",
+					Group: "front",
+				},
+			},
+			groups:      testdata.Groups(),
+			types:       testdata.Types(),
+			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture: "release_groups_single_change.md",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			release, err := changelog.NewRelease(tt.tag, tt.unreleasedEntries, tt.time, testTypes())
+			release, err := changelog.NewRelease(
+				tt.tag,
+				tt.entries,
+				tt.time,
+				tt.groups,
+				tt.types,
+			)
 			require.NoError(t, err)
 			wantData, err := os.ReadFile(filepath.Join("testdata", tt.wantFixture))
 			require.NoError(t, err)
