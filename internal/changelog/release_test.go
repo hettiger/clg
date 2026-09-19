@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/testdata"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,7 +43,7 @@ func TestNewRelease(t *testing.T) {
 			t.Parallel()
 
 			tag := "v0.0.0"
-			got, gotErr := changelog.NewRelease(tag, tt.unreleasedEntries, time.Now(), testTypes())
+			got, gotErr := changelog.NewRelease(tag, tt.unreleasedEntries, time.Now(), testdata.Types())
 
 			if tt.wantErrMsg != "" {
 				require.EqualError(t, gotErr, tt.wantErrMsg)
@@ -125,7 +126,7 @@ func TestReleaseMarkdown(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			release, err := changelog.NewRelease(tt.tag, tt.unreleasedEntries, tt.time, testTypes())
+			release, err := changelog.NewRelease(tt.tag, tt.unreleasedEntries, tt.time, testdata.Types())
 			require.NoError(t, err)
 			wantData, err := os.ReadFile(filepath.Join("testdata", tt.wantFixture))
 			require.NoError(t, err)

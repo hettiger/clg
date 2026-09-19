@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/hettiger/clg/internal/changelog"
+	"github.com/hettiger/clg/internal/testdata"
 	"github.com/stretchr/testify/require"
 )
 
@@ -78,7 +79,7 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := changelog.NewEntryStore(tt.fixtureDir, now, map[string]string{}, testTypes())
+			s := changelog.NewEntryStore(tt.fixtureDir, now, map[string]string{}, testdata.Types())
 
 			got, gotErr := s.UnreleasedEntries()
 
@@ -122,7 +123,7 @@ func TestEntryStoreWrite(t *testing.T) {
 		},
 		{
 			name:   "valid group",
-			groups: testGroups(),
+			groups: testdata.Groups(),
 			entry: changelog.ChangelogEntry{
 				Title: "Simple Feature",
 				Type:  "added",
@@ -149,7 +150,7 @@ func TestEntryStoreWrite(t *testing.T) {
 		},
 		{
 			name:   "invalid group with config",
-			groups: testGroups(),
+			groups: testdata.Groups(),
 			entry: changelog.ChangelogEntry{
 				Title: "Simple Feature",
 				Type:  "added",
@@ -163,7 +164,7 @@ func TestEntryStoreWrite(t *testing.T) {
 			t.Parallel()
 
 			root := t.TempDir()
-			s := changelog.NewEntryStore(root, now, tt.groups, testTypes())
+			s := changelog.NewEntryStore(root, now, tt.groups, testdata.Types())
 
 			gotPath, err := s.Write(tt.entry)
 
