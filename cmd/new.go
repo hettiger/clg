@@ -56,7 +56,6 @@ func NewNewCmd(app *App) *cobra.Command {
 }
 
 func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
-	var groups []*huh.Group
 	groupKeys := support.SortedMapKeys(app.config.Groups)
 	typeKeys := support.SortedMapKeys(app.config.Types)
 
@@ -71,6 +70,8 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	validateChangeType := func(value string) error {
 		return validation.ValidateIn("Type of change", value, typeKeys...)
 	}
+
+	var groups []*huh.Group
 
 	if len(groupKeys) > 0 && state.changeGroup == "" {
 		options := make([]huh.Option[string], 0, len(groupKeys))
@@ -152,16 +153,6 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	cmd.Print(yaml)
 
 	return nil
-}
-
-func newChangeTypeValidator(typeKeys []string) func(string) error {
-	return func(value string) error {
-		return validation.ValidateIn(
-			"Type of change",
-			value,
-			typeKeys...,
-		)
-	}
 }
 
 func validateTrimmedMessage(value string) error {
