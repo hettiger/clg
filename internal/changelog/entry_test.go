@@ -1,9 +1,9 @@
 package changelog_test
 
 import (
+	"errors"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/hettiger/clg/internal/changelog"
 	"github.com/hettiger/clg/internal/testdata"
@@ -93,27 +93,57 @@ func TestNewChangelogEntry(t *testing.T) {
 
 func TestEntryFilename(t *testing.T) {
 	tests := []struct {
-		name  string
-		entry changelog.ChangelogEntry
-		t     time.Time
-		want  string
+		name    string
+		entry   changelog.ChangelogEntry
+		uuidV7  func() (string, error)
+		want    string
+		wantErr bool
 	}{
 		{
 			name:  "changed",
 			entry: changelog.ChangelogEntry{Title: "fake message", Type: "changed"},
-			t:     time.Date(2026, 9, 5, 16, 32, 57, 0, time.UTC),
-			want:  "2026-09-05-163257-changed.yml",
+			uuidV7: func() (string, error) {
+				return "fake-uuidv7", nil
+			},
+			want: "changed-fake-uuidv7.yml",
 		},
 		{
 			name:  "added",
 			entry: changelog.ChangelogEntry{Title: "fake message", Type: "added"},
-			t:     time.Date(2026, 9, 5, 16, 32, 57, 0, time.UTC),
-			want:  "2026-09-05-163257-added.yml",
+			uuidV7: func() (string, error) {
+				return "fake-uuidv7", nil
+			},
+			want: "added-fake-uuidv7.yml",
+		},
+		{
+			name:  "front fixed",
+			entry: changelog.ChangelogEntry{Title: "fake message", Type: "added", Group: "front"},
+			uuidV7: func() (string, error) {
+				return "fake-uuidv7", nil
+			},
+			want: "front-added-fake-uuidv7.yml",
+		},
+		{
+			name:  "uuid error",
+			entry: changelog.ChangelogEntry{Title: "fake message", Type: "added", Group: "front"},
+			uuidV7: func() (string, error) {
+				return "", errors.New("error fake")
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.entry.Filename(tt.t)
+			t.Parallel()
+
+			got, gotErr := tt.entry.Filename(tt.uuidV7)
+
+			if tt.wantErr {
+				require.Error(t, gotErr)
+			} else {
+				require.NoError(t, gotErr)
+			}
+
 			assert.Equal(t, tt.want, got)
 		})
 	}

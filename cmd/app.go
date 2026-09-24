@@ -14,8 +14,18 @@ type App struct {
 	entryStore changelog.EntryStore
 }
 
-func NewApp(config config.Config, now func() time.Time, root string, entryStore changelog.EntryStore) *App {
-	return &App{config: config, now: now, rootDir: root, entryStore: entryStore}
+func NewApp(
+	config config.Config,
+	now func() time.Time,
+	root string,
+	entryStore changelog.EntryStore,
+) *App {
+	return &App{
+		config:     config,
+		now:        now,
+		rootDir:    root,
+		entryStore: entryStore,
+	}
 }
 
 func (a *App) Execute() error {
