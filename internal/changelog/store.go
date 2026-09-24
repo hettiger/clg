@@ -3,14 +3,12 @@ package changelog
 import (
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/hettiger/clg/internal/support"
 )
 
 type EntryStore struct {
 	rootDir   string
-	now       func() time.Time
 	uuidV7    func() (string, error)
 	groupKeys []string
 	typeKeys  []string
@@ -18,14 +16,12 @@ type EntryStore struct {
 
 func NewEntryStore(
 	root string,
-	now func() time.Time,
 	uuidV7 func() (string, error),
 	groups,
 	types map[string]string,
 ) EntryStore {
 	return EntryStore{
 		rootDir:   root,
-		now:       now,
 		uuidV7:    uuidV7,
 		groupKeys: support.SortedMapKeys(groups),
 		typeKeys:  support.SortedMapKeys(types),

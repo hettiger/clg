@@ -35,7 +35,12 @@ func main() {
 		return u.String(), nil
 	}
 
-	entryStore := changelog.NewEntryStore(rootDir, now, uuidV7, cfg.Groups, cfg.Types)
+	entryStore := changelog.NewEntryStore(
+		rootDir,
+		uuidV7,
+		cfg.Groups,
+		cfg.Types,
+	)
 
 	app := cmd.NewApp(cfg, now, rootDir, entryStore)
 

@@ -81,7 +81,6 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 
 			s := changelog.NewEntryStore(
 				tt.fixtureDir,
-				now,
 				uuidV7,
 				map[string]string{},
 				testdata.Types(),
@@ -172,7 +171,6 @@ func TestEntryStoreWrite(t *testing.T) {
 			root := t.TempDir()
 			s := changelog.NewEntryStore(
 				root,
-				now,
 				uuidV7,
 				tt.groups,
 				testdata.Types(),
