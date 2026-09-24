@@ -29,10 +29,18 @@ func showUnreleasedChangelogEntries(app *App) error {
 		return output.PrintSuccess("No changelog entries. Nothing to show.")
 	}
 
-	headers := []string{"No.", "Type", "Log", "Author"}
+	headers := []string{"No."}
+	if len(app.config.Groups) > 0 {
+		headers = append(headers, "Group")
+	}
+	headers = append(headers, "Type", "Log", "Author")
 	rows := make([][]string, len(unreleasedEntries))
 	for i, entry := range unreleasedEntries {
-		rows[i] = []string{strconv.Itoa(i + 1), entry.Type, entry.Title, entry.Author}
+		rows[i] = []string{strconv.Itoa(i + 1)}
+		if len(app.config.Groups) > 0 {
+			rows[i] = append(rows[i], entry.Group)
+		}
+		rows[i] = append(rows[i], entry.Type, entry.Title, entry.Author)
 	}
 
 	return output.PrintTable(headers, rows)
