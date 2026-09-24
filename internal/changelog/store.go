@@ -11,14 +11,22 @@ import (
 type EntryStore struct {
 	rootDir   string
 	now       func() time.Time
+	uuidV7    func() (string, error)
 	groupKeys []string
 	typeKeys  []string
 }
 
-func NewEntryStore(root string, now func() time.Time, groups, types map[string]string) EntryStore {
+func NewEntryStore(
+	root string,
+	now func() time.Time,
+	uuidV7 func() (string, error),
+	groups,
+	types map[string]string,
+) EntryStore {
 	return EntryStore{
 		rootDir:   root,
 		now:       now,
+		uuidV7:    uuidV7,
 		groupKeys: support.SortedMapKeys(groups),
 		typeKeys:  support.SortedMapKeys(types),
 	}
@@ -90,7 +98,12 @@ func (s EntryStore) Write(entry ChangelogEntry) (string, error) {
 		return "", err
 	}
 
-	path := filepath.Join(dir, entry.Filename(s.now()))
+	filename, err := entry.Filename(s.uuidV7)
+	if err != nil {
+		return "", nil
+	}
+
+	path := filepath.Join(dir, filename)
 
 	if err := os.WriteFile(path, data, 0644); err != nil {
 		return "", err

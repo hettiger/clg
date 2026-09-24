@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hettiger/clg/cmd"
 	"github.com/hettiger/clg/internal/changelog"
 	"github.com/hettiger/clg/internal/config"
@@ -25,7 +26,16 @@ func main() {
 		return time.Now().UTC()
 	}
 
-	entryStore := changelog.NewEntryStore(rootDir, now, cfg.Groups, cfg.Types)
+	uuidV7 := func() (string, error) {
+		u, err := uuid.NewV7()
+		if err != nil {
+			return "", err
+		}
+
+		return u.String(), nil
+	}
+
+	entryStore := changelog.NewEntryStore(rootDir, now, uuidV7, cfg.Groups, cfg.Types)
 
 	app := cmd.NewApp(cfg, now, rootDir, entryStore)
 

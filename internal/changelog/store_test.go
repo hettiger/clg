@@ -79,7 +79,13 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := changelog.NewEntryStore(tt.fixtureDir, now, map[string]string{}, testdata.Types())
+			s := changelog.NewEntryStore(
+				tt.fixtureDir,
+				now,
+				uuidV7,
+				map[string]string{},
+				testdata.Types(),
+			)
 
 			got, gotErr := s.UnreleasedEntries()
 
@@ -111,7 +117,7 @@ func TestEntryStoreWrite(t *testing.T) {
 				Title: "Simple Change",
 				Type:  "changed",
 			},
-			wantPath: "changelogs/unreleased/2026-09-13-182541-changed.yml",
+			wantPath: "changelogs/unreleased/changed-fake-uuid.yml",
 		},
 		{
 			name: "valid feature",
@@ -119,7 +125,7 @@ func TestEntryStoreWrite(t *testing.T) {
 				Title: "Simple Feature",
 				Type:  "added",
 			},
-			wantPath: "changelogs/unreleased/2026-09-13-182541-added.yml",
+			wantPath: "changelogs/unreleased/added-fake-uuid.yml",
 		},
 		{
 			name:   "valid group",
@@ -129,7 +135,7 @@ func TestEntryStoreWrite(t *testing.T) {
 				Type:  "added",
 				Group: "front",
 			},
-			wantPath: "changelogs/unreleased/2026-09-13-182541-added.yml",
+			wantPath: "changelogs/unreleased/front-added-fake-uuid.yml",
 		},
 		{
 			name: "invalid type",
@@ -164,7 +170,13 @@ func TestEntryStoreWrite(t *testing.T) {
 			t.Parallel()
 
 			root := t.TempDir()
-			s := changelog.NewEntryStore(root, now, tt.groups, testdata.Types())
+			s := changelog.NewEntryStore(
+				root,
+				now,
+				uuidV7,
+				tt.groups,
+				testdata.Types(),
+			)
 
 			gotPath, err := s.Write(tt.entry)
 

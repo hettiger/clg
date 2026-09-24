@@ -2,7 +2,7 @@ package changelog
 
 import (
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/hettiger/clg/internal/validation"
 	"go.yaml.in/yaml/v3"
@@ -72,10 +72,19 @@ func (e ChangelogEntry) Validate(groupKeys, typeKeys []string) error {
 	return nil
 }
 
-func (e ChangelogEntry) Filename(t time.Time) string {
-	return fmt.Sprintf(
-		"%s-%s.yml",
-		t.Format("2006-01-02-150405"),
-		e.Type,
-	)
+func (e ChangelogEntry) Filename(uuidV7 func() (string, error)) (string, error) {
+	id, err := uuidV7()
+	if err != nil {
+		return "", err
+	}
+
+	var filename strings.Builder
+
+	if e.Group != "" {
+		fmt.Fprintf(&filename, "%s-", e.Group)
+	}
+
+	fmt.Fprintf(&filename, "%s-%s.yml", e.Type, id)
+
+	return filename.String(), nil
 }
