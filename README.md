@@ -17,7 +17,7 @@ YAML file and turn all unreleased entries into a dated release when you publish.
 ├── clg.yml                  # optional configuration
 └── changelogs/
     └── unreleased/
-        └── 2026-09-06-142530-added.yml
+        └── added-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml
 ```
 
 The files in `changelogs/unreleased/` are temporary release notes. `clg release`
@@ -133,8 +133,10 @@ clg new [flags]
 | `-m, --message` | Entry text. If omitted, enter it interactively. |
 
 The flags can be supplied together, which makes the command non-interactive.
-The generated filename contains the UTC timestamp and type, for example
-`2026-09-06-142530-fixed.yml`.
+The generated filename contains the type and a UUIDv7, for example
+`fixed-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml`. When groups are configured,
+the group key is prefixed to the filename, for example
+`back-fixed-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml`.
 
 ### `clg show`
 
