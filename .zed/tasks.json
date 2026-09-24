@@ -1,32 +1,32 @@
 [
   {
     "label": "build",
-    "command": "go build .",
+    "command": "make build",
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
     "label": "install",
-    "command": "go install .",
+    "command": "make install",
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
     "label": "test",
-    "command": "go test ./...",
+    "command": "make test",
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
-    "label": "test:coverage",
-    "command": "go test ./... -coverprofile=coverage.out; go tool cover -html=coverage.out",
+    "label": "test-coverage",
+    "command": "make test-coverage",
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
-    "label": "test:coverage:summary",
-    "command": "go test ./... -coverprofile=coverage.out; go tool cover -func=coverage.out",
+    "label": "test-coverage-summary",
+    "command": "make test-coverage-summary",
     "cwd": "$ZED_WORKTREE_ROOT"
   },
   {
     "label": "licenses",
-    "command": "go run github.com/google/go-licenses@v1.0.0 save ./... --save_path=THIRD_PARTY_NOTICES",
+    "command": "make THIRD_PARTY_NOTICES",
     "cwd": "$ZED_WORKTREE_ROOT"
   }
 ]
