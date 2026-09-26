@@ -42,7 +42,9 @@ func main() {
 		cfg.Types,
 	)
 
-	app := cmd.NewApp(cfg, now, rootDir, entryStore)
+	gitService := changelog.NewGitService(rootDir)
+
+	app := cmd.NewApp(cfg, now, rootDir, entryStore, gitService)
 
 	if err := app.Execute(); err != nil {
 		log.Fatal(err)

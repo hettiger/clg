@@ -26,8 +26,9 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 		},
@@ -37,8 +38,9 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "invalid",
+					Type:   "invalid",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 			wantErrMsg: `unknown entry type: "invalid"`,
@@ -49,8 +51,9 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "",
+					Type:   "",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 			wantErrMsg: `missing entry type`,
@@ -61,9 +64,10 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "changed",
-					Group: "front",
+					Group:  "front",
+					Type:   "changed",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 		},
@@ -73,9 +77,10 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "changed",
-					Group: "invalid",
+					Group:  "invalid",
+					Type:   "changed",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 			wantErrMsg: `unknown entry group: "invalid"`,
@@ -86,9 +91,10 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "changed",
-					Group: "",
+					Group:  "",
+					Type:   "changed",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 			wantErrMsg: `missing entry group`,
@@ -135,8 +141,9 @@ func TestReleaseMarkdown(t *testing.T) {
 			tag:  "v0.0.0",
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 			types:       testdata.Types(),
@@ -148,12 +155,14 @@ func TestReleaseMarkdown(t *testing.T) {
 			tag:  "v0.1.0",
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "First Change",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "First Change",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Second Change",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "Second Change",
+					Branch: "fake-branch",
 				},
 			},
 			types:       testdata.Types(),
@@ -165,16 +174,19 @@ func TestReleaseMarkdown(t *testing.T) {
 			tag:  "v0.2.0",
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "First Change",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "First Change",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Simple Bug Fix",
-					Type:  "fixed",
+					Type:   "fixed",
+					Title:  "Simple Bug Fix",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Second Change",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "Second Change",
+					Branch: "fake-branch",
 				},
 			},
 			types:       testdata.Types(),
@@ -194,24 +206,28 @@ func TestReleaseMarkdown(t *testing.T) {
 			tag:  "v0.4.0",
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "First Change",
-					Type:  "changed",
-					Group: "front",
+					Group:  "front",
+					Type:   "changed",
+					Title:  "First Change",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Important Bug Fix",
-					Type:  "fixed",
-					Group: "back",
+					Group:  "back",
+					Type:   "fixed",
+					Title:  "Important Bug Fix",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Simple Bug Fix",
-					Type:  "fixed",
-					Group: "front",
+					Group:  "front",
+					Type:   "fixed",
+					Title:  "Simple Bug Fix",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Second Change",
-					Type:  "changed",
-					Group: "front",
+					Group:  "front",
+					Type:   "changed",
+					Title:  "Second Change",
+					Branch: "fake-branch",
 				},
 			},
 			groups:      testdata.Groups(),
@@ -225,9 +241,10 @@ func TestReleaseMarkdown(t *testing.T) {
 			tag:  "v0.5.0",
 			entries: []changelog.ChangelogEntry{
 				{
-					Title: "Single Change",
-					Type:  "changed",
-					Group: "front",
+					Group:  "front",
+					Type:   "changed",
+					Title:  "Single Change",
+					Branch: "fake-branch",
 				},
 			},
 			groups:      testdata.Groups(),

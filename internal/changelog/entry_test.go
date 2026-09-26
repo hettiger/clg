@@ -23,10 +23,11 @@ func TestNewChangelogEntry(t *testing.T) {
 			name:     "valid",
 			dataFile: "entry_valid.yml",
 			want: changelog.ChangelogEntry{
-				Title:  "Fake Title",
-				Type:   "added",
-				Author: "Fake Author",
 				Group:  "",
+				Type:   "added",
+				Title:  "Fake Title",
+				Author: "Fake Author",
+				Branch: "fake-branch",
 			},
 			wantErr: false,
 		},
@@ -35,10 +36,11 @@ func TestNewChangelogEntry(t *testing.T) {
 			dataFile:  "entry_valid_group.yml",
 			groupKeys: testdata.GroupKeys(),
 			want: changelog.ChangelogEntry{
-				Title:  "Fake Title",
-				Type:   "added",
-				Author: "Fake Author",
 				Group:  "front",
+				Type:   "added",
+				Title:  "Fake Title",
+				Author: "Fake Author",
+				Branch: "fake-branch",
 			},
 			wantErr: false,
 		},
@@ -100,32 +102,50 @@ func TestEntryFilename(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:  "changed",
-			entry: changelog.ChangelogEntry{Title: "fake message", Type: "changed"},
+			name: "changed",
+			entry: changelog.ChangelogEntry{
+				Type:   "changed",
+				Title:  "fake message",
+				Branch: "fake-branch",
+			},
 			uuidV7: func() (string, error) {
 				return "fake-uuidv7", nil
 			},
 			want: "changed-fake-uuidv7.yml",
 		},
 		{
-			name:  "added",
-			entry: changelog.ChangelogEntry{Title: "fake message", Type: "added"},
+			name: "added",
+			entry: changelog.ChangelogEntry{
+				Type:   "added",
+				Title:  "fake message",
+				Branch: "fake-branch",
+			},
 			uuidV7: func() (string, error) {
 				return "fake-uuidv7", nil
 			},
 			want: "added-fake-uuidv7.yml",
 		},
 		{
-			name:  "front fixed",
-			entry: changelog.ChangelogEntry{Title: "fake message", Type: "added", Group: "front"},
+			name: "front fixed",
+			entry: changelog.ChangelogEntry{
+				Group:  "front",
+				Type:   "added",
+				Title:  "fake message",
+				Branch: "fake-branch",
+			},
 			uuidV7: func() (string, error) {
 				return "fake-uuidv7", nil
 			},
 			want: "front-added-fake-uuidv7.yml",
 		},
 		{
-			name:  "uuid error",
-			entry: changelog.ChangelogEntry{Title: "fake message", Type: "added", Group: "front"},
+			name: "uuid error",
+			entry: changelog.ChangelogEntry{
+				Group:  "front",
+				Type:   "added",
+				Title:  "fake message",
+				Branch: "fake-branch",
+			},
 			uuidV7: func() (string, error) {
 				return "", errors.New("error fake")
 			},

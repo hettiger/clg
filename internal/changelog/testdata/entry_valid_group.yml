@@ -1,4 +1,5 @@
-title: Fake Title
-type: added
-author: Fake Author
 group: front
+type: added
+title: Fake Title
+author: Fake Author
+branch: fake-branch

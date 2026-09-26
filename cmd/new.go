@@ -133,10 +133,16 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 
 	state.message = strings.TrimSpace(state.message)
 
+	branch, err := app.gitService.CurrentBranch()
+	if err != nil {
+		return err
+	}
+
 	changelogEntry := changelog.ChangelogEntry{
-		Title: state.message,
-		Type:  state.changeType,
-		Group: state.changeGroup,
+		Group:  state.changeGroup,
+		Type:   state.changeType,
+		Title:  state.message,
+		Branch: branch,
 	}
 	path, err := app.entryStore.Write(changelogEntry)
 	if err != nil {
