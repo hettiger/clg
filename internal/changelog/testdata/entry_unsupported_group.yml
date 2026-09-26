@@ -1,5 +1,6 @@
 group: unsupported
 type: added
 title: Fake Title
-author: Fake Author
+author:
+    name: Fake Author
 branch: fake-branch

@@ -23,10 +23,11 @@ func TestNewChangelogEntry(t *testing.T) {
 			name:     "valid",
 			dataFile: "entry_valid.yml",
 			want: changelog.ChangelogEntry{
-				Group:  "",
-				Type:   "added",
-				Title:  "Fake Title",
-				Author: "Fake Author",
+				Type:  "added",
+				Title: "Fake Title",
+				Author: changelog.ChangelogEntryAuthor{
+					Name: "Fake Author",
+				},
 				Branch: "fake-branch",
 			},
 			wantErr: false,
@@ -36,10 +37,12 @@ func TestNewChangelogEntry(t *testing.T) {
 			dataFile:  "entry_valid_group.yml",
 			groupKeys: testdata.GroupKeys(),
 			want: changelog.ChangelogEntry{
-				Group:  "front",
-				Type:   "added",
-				Title:  "Fake Title",
-				Author: "Fake Author",
+				Group: "front",
+				Type:  "added",
+				Title: "Fake Title",
+				Author: changelog.ChangelogEntryAuthor{
+					Name: "Fake Author",
+				},
 				Branch: "fake-branch",
 			},
 			wantErr: false,

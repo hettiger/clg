@@ -51,7 +51,6 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Type:   "",
 					Title:  "Simple Change",
 					Branch: "fake-branch",
 				},
@@ -91,7 +90,6 @@ func TestNewRelease(t *testing.T) {
 			types:  testdata.Types(),
 			entries: []changelog.ChangelogEntry{
 				{
-					Group:  "",
 					Type:   "changed",
 					Title:  "Simple Change",
 					Branch: "fake-branch",

@@ -1,5 +1,6 @@
 group: Fake Group
 type: fake
 title: Fake Title
-author: Fake Author
+author:
+    name: Fake Author
 branch: fake-branch
