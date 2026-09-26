@@ -2,4 +2,4 @@ group: Fake Group
 type: changed
 title: ""
 author: Fake Author
-branch: ""
+branch: "fake-branch"
