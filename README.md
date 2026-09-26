@@ -84,6 +84,12 @@ Review the unreleased entries:
 clg show
 ```
 
+To show only entries recorded on a specific Git branch:
+
+```sh
+clg show --branch feature/report-export
+```
+
 When you are ready to publish, pass the release tag:
 
 ```sh
@@ -133,9 +139,10 @@ clg new [flags]
 | `-m, --message` | Entry text. If omitted, enter it interactively. |
 
 The flags can be supplied together, which makes the command non-interactive.
-The generated filename contains the type and a UUIDv7, for example
-`fixed-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml`. When groups are configured,
-the group key is prefixed to the filename, for example
+`clg new` records the current Git branch in the entry, so it must be run from
+a Git working tree. The generated filename contains the type and a UUIDv7, for
+example `fixed-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml`. When groups are
+configured, the group key is prefixed to the filename, for example
 `back-fixed-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml`.
 
 ### `clg show`
@@ -146,9 +153,14 @@ Display all valid entries that have not yet been released:
 clg show
 ```
 
-The output includes the type, message, and optional author. Group values are
-stored in entries and used when generating a release. If there are no entries,
-`clg` reports that there is nothing to show.
+The output includes the type, title, and the Git branch associated with each
+entry. Use `--branch` (or `-b`) to filter entries by branch. Group values are
+shown when groups are configured and are used when generating a release. If
+there are no matching entries, `clg` reports that there is nothing to show.
+
+| Flag | Description |
+| --- | --- |
+| `-b, --branch` | Show only entries recorded on the specified Git branch. |
 
 ### `clg release [tag]`
 
@@ -237,21 +249,23 @@ groups:
 
 ## Entry format
 
-Each entry is a YAML document. `clg new` writes the required `title` and `type`
-fields, plus `group` when groups are configured:
+Each entry is a YAML document. `clg new` writes the `title`, `type`, and current
+Git `branch`, plus `group` when groups are configured:
 
 ```yaml
-title: Improve report permissions
-type: changed
 group: back
+type: changed
+title: Improve report permissions
 author: Jane Doe
+branch: feature/report-export
 ```
 
-The `author` field is optional and is displayed by `clg show`; it is not set by
-`clg new`. Every YAML file in `changelogs/unreleased/` must have a non-empty
-`title`, a configured `type`, and—when groups are configured—a configured
-`group`. Invalid files prevent commands that read unreleased entries from
-completing.
+The `author` field is optional and is not set by `clg new`. The `branch` field
+is populated automatically from the current Git branch and is used by
+`clg show --branch`. Every YAML file in `changelogs/unreleased/` must have a
+non-empty `title`, a configured `type`, and—when groups are configured—a
+configured `group`. Invalid files prevent commands that read unreleased entries
+from completing.
 
 ## Typical release workflow
 
@@ -260,8 +274,11 @@ completing.
 clg new -g back -t added -m "Add CSV export"
 clg new -g front -t fixed -m "Handle empty report filters"
 
-# Before publishing
+# Review all entries, or only entries from one branch
 clg show
+clg show -b feature/report-export
+
+# Before publishing
 clg release v1.2.0
 git diff -- CHANGELOG.md
 git add CHANGELOG.md
