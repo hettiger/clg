@@ -9,13 +9,13 @@ type GitServcie struct {
 	workingDir string
 }
 
-func NewGitService(workingDir string) *GitServcie {
-	return &GitServcie{
+func NewGitService(workingDir string) GitServcie {
+	return GitServcie{
 		workingDir: workingDir,
 	}
 }
 
-func (g *GitServcie) CurrentBranch() (string, error) {
+func (g GitServcie) CurrentBranch() (string, error) {
 	cmd := exec.Command("git", "branch", "--show-current")
 	cmd.Dir = g.workingDir
 
