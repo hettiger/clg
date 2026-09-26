@@ -33,14 +33,14 @@ func showUnreleasedChangelogEntries(app *App) error {
 	if len(app.config.Groups) > 0 {
 		headers = append(headers, "Group")
 	}
-	headers = append(headers, "Type", "Log", "Author")
+	headers = append(headers, "Type", "Title", "Branch")
 	rows := make([][]string, len(unreleasedEntries))
 	for i, entry := range unreleasedEntries {
 		rows[i] = []string{strconv.Itoa(i + 1)}
 		if len(app.config.Groups) > 0 {
 			rows[i] = append(rows[i], entry.Group)
 		}
-		rows[i] = append(rows[i], entry.Type, entry.Title, entry.Author)
+		rows[i] = append(rows[i], entry.Type, entry.Title, entry.Branch)
 	}
 
 	return output.PrintTable(headers, rows)
