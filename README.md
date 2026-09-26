@@ -14,7 +14,7 @@ YAML file and turn all unreleased entries into a dated release when you publish.
 ```text
 .
 ├── CHANGELOG.md
-├── clg.yml                  # optional configuration
+├── .clg.yml                  # optional configuration
 └── changelogs/
     └── unreleased/
         └── added-0199321f-7b2c-7c4f-bd12-4c5f8f7c2a10.yml
@@ -49,7 +49,7 @@ default marker is `<!-- CLG -->`:
 <!-- CLG -->
 ```
 
-Optionally configure groups, custom labels, or a different marker in `clg.yml`:
+Optionally configure groups, custom labels, or a different marker in `.clg.yml`:
 
 ```yaml
 marker: "<!-- CLG -->"
@@ -221,7 +221,7 @@ The heading is used when `clg release` groups entries.
 
 ## Configuration
 
-Configuration is loaded from an optional `clg.yml` in the current working
+Configuration is loaded from an optional `.clg.yml` in the current working
 directory. The defaults are:
 
 ```yaml

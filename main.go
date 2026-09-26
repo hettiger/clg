@@ -12,12 +12,17 @@ import (
 )
 
 func main() {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	rootDir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	cfg, err := config.Load(rootDir)
+	cfg, err := config.Load(userHomeDir, rootDir)
 	if err != nil {
 		log.Fatal(err)
 	}
