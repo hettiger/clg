@@ -139,9 +139,9 @@ func addChangelogEntry(app *App, cmd *cobra.Command, state *newCmdState) error {
 	}
 
 	changelogEntry := changelog.ChangelogEntry{
-		Title:  state.message,
-		Type:   state.changeType,
 		Group:  state.changeGroup,
+		Type:   state.changeType,
+		Title:  state.message,
 		Branch: branch,
 	}
 	path, err := app.entryStore.Write(changelogEntry)

@@ -30,8 +30,9 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 			fixtureDir: "testdata/roots/unexpected_file",
 			want: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "added",
+					Type:   "added",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 		},
@@ -40,8 +41,9 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 			fixtureDir: "testdata/roots/unexpected_subdir",
 			want: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "added",
+					Type:   "added",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 		},
@@ -50,8 +52,9 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 			fixtureDir: "testdata/roots/single_entry",
 			want: []changelog.ChangelogEntry{
 				{
-					Title: "Simple Change",
-					Type:  "added",
+					Type:   "added",
+					Title:  "Simple Change",
+					Branch: "fake-branch",
 				},
 			},
 		},
@@ -60,16 +63,19 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 			fixtureDir: "testdata/roots/multiple_entries",
 			want: []changelog.ChangelogEntry{
 				{
-					Title: "New Feature",
-					Type:  "added",
+					Type:   "added",
+					Title:  "New Feature",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Changed Feature",
-					Type:  "changed",
+					Type:   "changed",
+					Title:  "Changed Feature",
+					Branch: "fake-branch",
 				},
 				{
-					Title: "Fixed Feature",
-					Type:  "fixed",
+					Type:   "fixed",
+					Title:  "Fixed Feature",
+					Branch: "fake-branch",
 				},
 			},
 		},
@@ -113,16 +119,18 @@ func TestEntryStoreWrite(t *testing.T) {
 		{
 			name: "valid change",
 			entry: changelog.ChangelogEntry{
-				Title: "Simple Change",
-				Type:  "changed",
+				Type:   "changed",
+				Title:  "Simple Change",
+				Branch: "fake-branch",
 			},
 			wantPath: "changelogs/unreleased/changed-fake-uuid.yml",
 		},
 		{
 			name: "valid feature",
 			entry: changelog.ChangelogEntry{
-				Title: "Simple Feature",
-				Type:  "added",
+				Type:   "added",
+				Title:  "Simple Feature",
+				Branch: "fake-branch",
 			},
 			wantPath: "changelogs/unreleased/added-fake-uuid.yml",
 		},
@@ -130,26 +138,29 @@ func TestEntryStoreWrite(t *testing.T) {
 			name:   "valid group",
 			groups: testdata.Groups(),
 			entry: changelog.ChangelogEntry{
-				Title: "Simple Feature",
-				Type:  "added",
-				Group: "front",
+				Group:  "front",
+				Type:   "added",
+				Title:  "Simple Feature",
+				Branch: "fake-branch",
 			},
 			wantPath: "changelogs/unreleased/front-added-fake-uuid.yml",
 		},
 		{
 			name: "invalid type",
 			entry: changelog.ChangelogEntry{
-				Title: "Simple Feature",
-				Type:  "invalid",
+				Type:   "invalid",
+				Title:  "Simple Feature",
+				Branch: "fake-branch",
 			},
 			wantErr: true,
 		},
 		{
 			name: "invalid group without config",
 			entry: changelog.ChangelogEntry{
-				Title: "Simple Feature",
-				Type:  "added",
-				Group: "invalid",
+				Group:  "invalid",
+				Type:   "added",
+				Title:  "Simple Feature",
+				Branch: "fake-branch",
 			},
 			wantErr: true,
 		},
@@ -157,9 +168,10 @@ func TestEntryStoreWrite(t *testing.T) {
 			name:   "invalid group with config",
 			groups: testdata.Groups(),
 			entry: changelog.ChangelogEntry{
-				Title: "Simple Feature",
-				Type:  "added",
-				Group: "invalid",
+				Group:  "invalid",
+				Type:   "added",
+				Title:  "Simple Feature",
+				Branch: "fake-branch",
 			},
 			wantErr: true,
 		},
