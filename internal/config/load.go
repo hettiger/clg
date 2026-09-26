@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -12,9 +13,14 @@ const configFilename = ".clg.yml"
 
 func Load(userHomeDir, projectDir string) (Config, error) {
 	v := viper.New()
+
 	v.SetDefault("marker", "<!-- CLG -->")
 	v.SetDefault("types", defaultTypes())
 	v.SetDefault("markdown.listStyle", "-")
+
+	v.SetEnvPrefix("clg")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
 
 	if err := mergeConfigFile(v, filepath.Join(userHomeDir, configFilename)); err != nil {
 		return Config{}, err
