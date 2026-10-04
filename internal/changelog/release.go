@@ -50,7 +50,9 @@ func NewRelease(
 func (r Release) Markdown() (string, error) {
 	var result strings.Builder
 
-	fmt.Fprintf(&result, "## [%s] - %s", r.tag, r.time.Format("2006-01-02"))
+	if _, err := fmt.Fprintf(&result, "## [%s] - %s", r.tag, r.time.Format("2006-01-02")); err != nil {
+		return "", err
+	}
 
 	switch r.sections[0].kind {
 	case groupSectionKind:
@@ -73,7 +75,9 @@ func (r Release) renderGroupSectionsMarkdown(sections []section, result *strings
 			continue
 		}
 
-		fmt.Fprintf(result, "\n\n### %s", group.headline)
+		if _, err := fmt.Fprintf(result, "\n\n### %s", group.headline); err != nil {
+			return err
+		}
 
 		if err := r.renderTypeSectionsMarkdown(group.children, "####", result); err != nil {
 			return err
@@ -102,14 +106,16 @@ func (r Release) renderTypeSectionsMarkdown(
 			groupCountSuffix = "changes"
 		}
 
-		fmt.Fprintf(
+		if _, err := fmt.Fprintf(
 			result,
 			"\n\n%s %s (%d %s)\n",
 			headingPrefix,
 			groupLabel,
 			groupCount,
 			groupCountSuffix,
-		)
+		); err != nil {
+			return err
+		}
 
 		for _, e := range groupedEntries {
 			issue, err := e.Issue(r.issuePattern)
