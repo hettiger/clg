@@ -146,6 +146,7 @@ func TestReleaseMarkdown(t *testing.T) {
 		issuePattern string
 		time         time.Time
 		wantFixture  string
+		wantErr      bool
 	}{
 		{
 			name: "single change",
@@ -314,6 +315,78 @@ func TestReleaseMarkdown(t *testing.T) {
 			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
 			wantFixture:  "release_single_change_issue.md",
 		},
+
+		{
+			name: "groups single change issue author",
+			tag:  "v0.5.4",
+			entries: []changelog.ChangelogEntry{
+				{
+					Group:  "front",
+					Type:   "changed",
+					Title:  "Single Change",
+					Branch: "feature/3-fake-branch",
+					Author: "[Fake Author](https://github.com/fake-author)",
+				},
+			},
+			groups:       testdata.Groups(),
+			types:        testdata.Types(),
+			issuePrefix:  "#",
+			issuePattern: "^feature/(\\d+)-",
+			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:  "release_groups_single_change_issue_author.md",
+		},
+
+		{
+			name: "issue pattern mismatch",
+			tag:  "v0.5.5",
+			entries: []changelog.ChangelogEntry{
+				{
+					Type:   "changed",
+					Title:  "Single Change",
+					Branch: "3-fake-branch",
+					Author: "Fake Author",
+				},
+			},
+			types:        testdata.Types(),
+			issuePrefix:  "#",
+			issuePattern: "^feature/(\\d+)-",
+			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:  "release_issue_pattern_mismatch.md",
+		},
+
+		{
+			name: "issue pattern invalid",
+			tag:  "v0.5.6",
+			entries: []changelog.ChangelogEntry{
+				{
+					Type:   "changed",
+					Title:  "Single Change",
+					Branch: "feature/3-fake-branch",
+				},
+			},
+			types:        testdata.Types(),
+			issuePrefix:  "#",
+			issuePattern: "^feature/(\\d+-",
+			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantErr:      true,
+		},
+
+		{
+			name: "invalid capturing groups",
+			tag:  "v0.5.7",
+			entries: []changelog.ChangelogEntry{
+				{
+					Type:   "changed",
+					Title:  "Single Change",
+					Branch: "feature/3-fake-branch",
+				},
+			},
+			types:        testdata.Types(),
+			issuePrefix:  "#",
+			issuePattern: "^feature/(\\d+)-(.+)$",
+			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantErr:      true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -329,13 +402,22 @@ func TestReleaseMarkdown(t *testing.T) {
 				tt.issuePattern,
 			)
 			require.NoError(t, err)
-			wantData, err := os.ReadFile(filepath.Join("testdata", tt.wantFixture))
-			require.NoError(t, err)
-			want := strings.TrimSpace(string(wantData))
+
+			var want string
+			if !tt.wantErr {
+				wantData, err := os.ReadFile(filepath.Join("testdata", tt.wantFixture))
+				require.NoError(t, err)
+				want = strings.TrimSpace(string(wantData))
+			}
 
 			got, gotErr := release.Markdown()
 
-			require.NoError(t, gotErr)
+			if tt.wantErr {
+				require.Error(t, gotErr)
+			} else {
+				require.NoError(t, gotErr)
+			}
+
 			require.Equal(t, want, got)
 		})
 	}
