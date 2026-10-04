@@ -14,11 +14,13 @@ import (
 
 func TestNewRelease(t *testing.T) {
 	tests := []struct {
-		name       string
-		groups     map[string]string
-		types      map[string]string
-		entries    []changelog.ChangelogEntry
-		wantErrMsg string
+		name         string
+		groups       map[string]string
+		types        map[string]string
+		entries      []changelog.ChangelogEntry
+		issuePrefix  string
+		issuePattern string
+		wantErrMsg   string
 	}{
 		{
 			name:       "empty sections",
@@ -116,6 +118,8 @@ func TestNewRelease(t *testing.T) {
 				time.Now(),
 				tt.groups,
 				tt.types,
+				tt.issuePrefix,
+				tt.issuePattern,
 			)
 
 			if tt.wantErrMsg != "" {
@@ -133,13 +137,15 @@ func TestNewRelease(t *testing.T) {
 
 func TestReleaseMarkdown(t *testing.T) {
 	tests := []struct {
-		name        string
-		tag         string
-		entries     []changelog.ChangelogEntry
-		groups      map[string]string
-		types       map[string]string
-		time        time.Time
-		wantFixture string
+		name         string
+		tag          string
+		entries      []changelog.ChangelogEntry
+		groups       map[string]string
+		types        map[string]string
+		issuePrefix  string
+		issuePattern string
+		time         time.Time
+		wantFixture  string
 	}{
 		{
 			name: "single change",
@@ -291,6 +297,23 @@ func TestReleaseMarkdown(t *testing.T) {
 			time:        time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
 			wantFixture: "release_groups_single_change_author.md",
 		},
+
+		{
+			name: "single change issue",
+			tag:  "v0.5.3",
+			entries: []changelog.ChangelogEntry{
+				{
+					Type:   "changed",
+					Title:  "Single Change",
+					Branch: "feature/3-fake-branch",
+				},
+			},
+			types:        testdata.Types(),
+			issuePrefix:  "#",
+			issuePattern: "^feature/(\\d+)-",
+			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:  "release_single_change_issue.md",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -302,14 +325,17 @@ func TestReleaseMarkdown(t *testing.T) {
 				tt.time,
 				tt.groups,
 				tt.types,
+				tt.issuePrefix,
+				tt.issuePattern,
 			)
 			require.NoError(t, err)
 			wantData, err := os.ReadFile(filepath.Join("testdata", tt.wantFixture))
 			require.NoError(t, err)
 			want := strings.TrimSpace(string(wantData))
 
-			got := release.Markdown()
+			got, gotErr := release.Markdown()
 
+			require.NoError(t, gotErr)
 			require.Equal(t, want, got)
 		})
 	}

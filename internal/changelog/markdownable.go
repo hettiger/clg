@@ -1,5 +1,5 @@
 package changelog
 
 type Markdownable interface {
-	Markdown() string
+	Markdown() (string, error)
 }

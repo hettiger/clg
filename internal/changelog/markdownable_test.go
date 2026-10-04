@@ -10,6 +10,6 @@ func newMarkdownableFake(value string) markdownableFake {
 	}
 }
 
-func (f markdownableFake) Markdown() string {
-	return f.value
+func (f markdownableFake) Markdown() (string, error) {
+	return f.value, nil
 }
