@@ -60,11 +60,11 @@ Use `-b, --branch` to filter by branch.
 ### `clg release <tag>`
 
 Group entries by type, or by group and then type, and insert a release into
-`CHANGELOG.md` using the current UTC date. Deletes the source entries afterward;
-does nothing when there are no entries.
+`CHANGELOG.md` using the current date in the configured timezone (UTC by default).
+Deletes the source entries afterward; does nothing when there are no entries.
 
 The insertion marker must already exist. Override the configured marker with
-`-m, --marker`.
+`-m, --marker` or the timezone with `-t, --timezone`.
 
 ### `clg clean`
 
@@ -85,12 +85,17 @@ Both configuration files are optional:
 Project settings override global settings, which override built-in defaults.
 Nested mappings merge field by field. Environment variables override file
 settings, using the `CLG_` prefix and underscores for nested keys (for example,
-`CLG_MARKER`). Empty environment values are ignored, except for `CLG_AUTHOR`.
+`CLG_MARKER` and `CLG_TIMEZONE`). Empty environment values are ignored, except
+for `CLG_AUTHOR`.
 
-The default marker and change types are:
+Set `timezone` to an IANA location name such as `America/New_York`; it defaults
+to `UTC`.
+
+The default marker, timezone, and change types are:
 
 ```yaml
 marker: "<!-- CLG -->"
+timezone: UTC
 types:
   added: New Feature
   fixed: Bug Fix

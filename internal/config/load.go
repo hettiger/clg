@@ -16,6 +16,7 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 	v := viper.New()
 
 	v.SetDefault("marker", "<!-- CLG -->")
+	v.SetDefault("timezone", "UTC")
 	v.SetDefault("types", defaultTypes())
 	v.SetDefault("markdown.listStyle", "-")
 
@@ -26,6 +27,7 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 	// Unmarshal only sees known keys, even when AutomaticEnv is enabled.
 	for _, key := range []string{
 		"marker",
+		"timezone",
 		"author",
 		"markdown.listStyle",
 		"markdown.groupsAsList",
