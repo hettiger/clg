@@ -19,6 +19,8 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 	v.SetDefault("timezone", "UTC")
 	v.SetDefault("types", defaultTypes())
 	v.SetDefault("markdown.listStyle", "-")
+	v.SetDefault("issue.displayPrefix", "#")
+	v.SetDefault("issue.pattern", "^(?:[^\\/]+\\/)?(\\d+)-\\S+$") // extracts `31` in `feature/31-description` or `31-description`
 
 	v.SetEnvPrefix("clg")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -31,6 +33,8 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 		"author",
 		"markdown.listStyle",
 		"markdown.groupsAsList",
+		"issue.displayPrefix",
+		"issue.pattern",
 	} {
 		if err := v.BindEnv(key); err != nil {
 			return Config{}, fmt.Errorf("bind environment variable for %q: %w", key, err)

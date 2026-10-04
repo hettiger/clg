@@ -7,9 +7,15 @@ type Config struct {
 	Types    map[string]string `mapstructure:"types"`
 	Author   *string           `mapstructure:"author"`
 	Markdown MarkdownConfig    `mapstructure:"markdown"`
+	Issue    IssueConfig       `mapstructure:"issue"`
 }
 
 type MarkdownConfig struct {
 	ListStyle    string `mapstructure:"listStyle"`
 	GroupsAsList bool   `mapstructure:"groupsAsList"`
+}
+
+type IssueConfig struct {
+	DisplayPrefix string `mapstructure:"displayPrefix"`
+	Pattern       string `mapstructure:"pattern"`
 }

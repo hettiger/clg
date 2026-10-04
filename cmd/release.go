@@ -11,8 +11,10 @@ import (
 )
 
 type releaseCmdState struct {
-	marker   string
-	timezone string
+	marker             string
+	timezone           string
+	issueDisplayPrefix string
+	issuePattern       string
 }
 
 func NewReleaseCmd(app *App) *cobra.Command {
@@ -41,6 +43,22 @@ func NewReleaseCmd(app *App) *cobra.Command {
 		"t",
 		app.config.Timezone,
 		"timezone",
+	)
+
+	releaseCmd.Flags().StringVarP(
+		&state.issueDisplayPrefix,
+		"issue-display-prefix",
+		"p",
+		app.config.Issue.DisplayPrefix,
+		"issue display prefix",
+	)
+
+	releaseCmd.Flags().StringVarP(
+		&state.issuePattern,
+		"issue-pattern",
+		"i",
+		app.config.Issue.Pattern,
+		"issue pattern",
 	)
 
 	return releaseCmd
@@ -72,6 +90,8 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 		app.now().In(location),
 		app.config.Groups,
 		app.config.Types,
+		state.issueDisplayPrefix,
+		state.issuePattern,
 	)
 	if err != nil {
 		return err

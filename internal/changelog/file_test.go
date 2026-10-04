@@ -144,7 +144,11 @@ func TestChangelogFileAddRelease(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			assert.Equal(t, release.Markdown(), got)
+
+			md, err := release.Markdown()
+			require.NoError(t, err)
+
+			assert.Equal(t, md, got)
 
 			if tt.wantFixture == "" {
 				return
