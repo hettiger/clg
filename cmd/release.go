@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/hettiger/clg/cmd/output"
 	"github.com/hettiger/clg/internal/changelog"
@@ -10,6 +12,7 @@ import (
 
 type releaseCmdState struct {
 	marker             string
+	timezone           string
 	issueDisplayPrefix string
 	issuePattern       string
 }
@@ -35,6 +38,14 @@ func NewReleaseCmd(app *App) *cobra.Command {
 	)
 
 	releaseCmd.Flags().StringVarP(
+		&state.timezone,
+		"timezone",
+		"t",
+		app.config.Timezone,
+		"timezone",
+	)
+
+	releaseCmd.Flags().StringVarP(
 		&state.issueDisplayPrefix,
 		"issue-display-prefix",
 		"p",
@@ -54,6 +65,11 @@ func NewReleaseCmd(app *App) *cobra.Command {
 }
 
 func addRelease(app *App, args []string, state *releaseCmdState) error {
+	location, err := time.LoadLocation(state.timezone)
+	if err != nil {
+		return fmt.Errorf("invalid timezone %q: %w", state.timezone, err)
+	}
+
 	entryFiles, err := app.entryStore.UnreleasedEntryFiles()
 	if err != nil {
 		return err
@@ -71,7 +87,7 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 	release, err := changelog.NewRelease(
 		args[0],
 		unreleasedEntries,
-		app.now(),
+		app.now().In(location),
 		app.config.Groups,
 		app.config.Types,
 		state.issueDisplayPrefix,

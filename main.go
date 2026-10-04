@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/google/uuid"
 	"github.com/hettiger/clg/cmd"
