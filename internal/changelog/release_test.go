@@ -387,6 +387,23 @@ func TestReleaseMarkdown(t *testing.T) {
 			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
 			wantErr:      true,
 		},
+
+		{
+			name: "missing issue pattern",
+			tag:  "v0.0.0",
+			entries: []changelog.ChangelogEntry{
+				{
+					Type:   "changed",
+					Title:  "Simple Change",
+					Branch: "feature/3-fake-branch",
+				},
+			},
+			types:        testdata.Types(),
+			issuePrefix:  "",
+			issuePattern: "",
+			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:  "release_single_change.md",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
