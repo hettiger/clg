@@ -17,7 +17,8 @@ Or build from a checkout with `go build -o clg .`.
 
 ## Quick start
 
-Add `<!-- CLG -->` to your `CHANGELOG.md`, then run from your Git working tree:
+Add `<!-- CLG -->` to your `CHANGELOG.md`, then run from your Git working tree
+on a branch such as `feature/31-report-export`:
 
 ```sh
 clg new -t added -m "Support exporting reports" -a "Jane Doe"
@@ -33,7 +34,7 @@ from `changelogs/unreleased/`:
 
 ### New Feature (1 change)
 
-- Support exporting reports (Jane Doe)
+- Support exporting reports (#31, Jane Doe)
 ```
 
 ## Commands
@@ -64,7 +65,9 @@ Group entries by type, or by group and then type, and insert a release into
 Deletes the source entries afterward; does nothing when there are no entries.
 
 The insertion marker must already exist. Override the configured marker with
-`-m, --marker` or the timezone with `-t, --timezone`.
+`-m, --marker` or the timezone with `-t, --timezone`. Issue references can be
+customized with `-p, --issue-display-prefix` and `-i, --issue-pattern`; see
+[Issue references](#issue-references).
 
 ### `clg clean`
 
@@ -134,9 +137,37 @@ for a default, `CLG_AUTHOR=""` for an environment override, or `--author ""`
 for one entry. Git lookup is best-effort; missing authors are silently omitted.
 `clg new` trims surrounding whitespace and never prompts for an author.
 
-Releases append the recorded author in parentheses, verbatim. Markdown is not
-escaped and links are not validated. Attribution comes from the entry, not the
-configuration at release time.
+Releases append the recorded author in parentheses, verbatim, after any issue
+reference. Markdown is not escaped and links are not validated. Attribution
+comes from the entry, not the configuration at release time.
+
+### Issue references
+
+Releases extract issue numbers from recorded branch names. By default,
+`feature/31-description` or `31-description` adds `#31` to the entry:
+
+```md
+- Support exporting reports (#31, Jane Doe)
+```
+
+Without an author, only `(#31)` is appended. Branches that do not match simply
+omit the issue reference.
+
+Customize these defaults in `.clg.yml`:
+
+```yaml
+issue:
+  displayPrefix: "#"
+  pattern: '^(?:[^\/]+\/)?(\d+)-\S+$'
+```
+
+The pattern must be a valid regular expression with exactly one capturing group
+for the issue identifier; invalid patterns block release generation. Set
+`issue.pattern: ""` or use `clg release <tag> --issue-pattern ""` to disable
+issue references.
+
+Environment overrides are `CLG_ISSUE_DISPLAYPREFIX` and `CLG_ISSUE_PATTERN`.
+Release flags override configuration for that release only.
 
 ## Entry format
 
