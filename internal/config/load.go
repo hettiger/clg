@@ -18,6 +18,8 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 	v.SetDefault("marker", "<!-- CLG -->")
 	v.SetDefault("types", defaultTypes())
 	v.SetDefault("markdown.listStyle", "-")
+	v.SetDefault("issue.displayPrefix", "#")
+	v.SetDefault("issue.pattern", "^(?:[^\\/]+\\/)?(\\d+)-\\S+$") // extracts `31` in `feature/31-description` or `31-description`
 
 	v.SetEnvPrefix("clg")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

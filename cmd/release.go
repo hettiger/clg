@@ -9,7 +9,9 @@ import (
 )
 
 type releaseCmdState struct {
-	marker string
+	marker             string
+	issueDisplayPrefix string
+	issuePattern       string
 }
 
 func NewReleaseCmd(app *App) *cobra.Command {
@@ -30,6 +32,22 @@ func NewReleaseCmd(app *App) *cobra.Command {
 		"m",
 		app.config.Marker,
 		"insertion marker for new releases",
+	)
+
+	releaseCmd.Flags().StringVarP(
+		&state.issueDisplayPrefix,
+		"issue-display-prefix",
+		"p",
+		app.config.Issue.DisplayPrefix,
+		"issue display prefix",
+	)
+
+	releaseCmd.Flags().StringVarP(
+		&state.issuePattern,
+		"issue-pattern",
+		"i",
+		app.config.Issue.Pattern,
+		"issue pattern",
 	)
 
 	return releaseCmd
@@ -56,8 +74,8 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 		app.now(),
 		app.config.Groups,
 		app.config.Types,
-		app.config.Issue.DisplayPrefix,
-		app.config.Issue.Pattern,
+		state.issueDisplayPrefix,
+		state.issuePattern,
 	)
 	if err != nil {
 		return err

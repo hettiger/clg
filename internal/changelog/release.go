@@ -123,9 +123,9 @@ func (r Release) renderTypeSectionsMarkdown(
 			var meta string
 			switch {
 			case issue != "" && e.Author != "":
-				meta = fmt.Sprintf(" (%s%d, %s)", r.issueDisplayPrefix, issue, e.Author)
+				meta = fmt.Sprintf(" (%s%s, %s)", r.issueDisplayPrefix, issue, e.Author)
 			case issue != "":
-				meta = fmt.Sprintf(" (%s%d)", r.issueDisplayPrefix, issue)
+				meta = fmt.Sprintf(" (%s%s)", r.issueDisplayPrefix, issue)
 			case e.Author != "":
 				meta = fmt.Sprintf(" (%s)", e.Author)
 			default:
