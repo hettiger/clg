@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/hettiger/clg/internal/support"
 	"github.com/hettiger/clg/internal/validation"
 	"go.yaml.in/yaml/v3"
 )
@@ -97,33 +96,27 @@ var (
 	ErrIssuePatternInvalid              = errors.New("the pattern is invalid and does not compile")
 	ErrIssuePatternCaptureGroupsInvalid = errors.New("the pattern must have exactly one capturing group")
 	ErrIssuePatternMismatch             = errors.New("the entry branch does not match the issue pattern")
-	ErrIssueValueInvalid                = errors.New("failed to parse uint from branch via the issue pattern")
 )
 
-func (e ChangelogEntry) Issue(pattern string) (uint, error) {
+func (e ChangelogEntry) Issue(pattern string) (string, error) {
 	if pattern == "" {
-		return 0, nil
+		return "", nil
 	}
 
 	re, err := regexp.Compile(pattern)
 	if err != nil {
-		return 0, fmt.Errorf("issue pattern %q: %w: %w", pattern, ErrIssuePatternInvalid, err)
+		return "", fmt.Errorf("issue pattern %q: %w: %w", pattern, ErrIssuePatternInvalid, err)
 	}
 
 	if re.NumSubexp() != 1 {
-		return 0, fmt.Errorf("issue pattern %q: %w", pattern, ErrIssuePatternCaptureGroupsInvalid)
+		return "", fmt.Errorf("issue pattern %q: %w", pattern, ErrIssuePatternCaptureGroupsInvalid)
 	}
 
 	matches := re.FindStringSubmatch(e.Branch)
 
 	if matches == nil {
-		return 0, fmt.Errorf("issue pattern %q for branch %q: %w", pattern, e.Branch, ErrIssuePatternMismatch)
+		return "", fmt.Errorf("issue pattern %q for branch %q: %w", pattern, e.Branch, ErrIssuePatternMismatch)
 	}
 
-	issue, err := support.ParseUint(matches[1])
-	if err != nil {
-		return 0, fmt.Errorf("issue pattern %q for branch %q captured %q: %w: %w", pattern, e.Branch, matches[1], ErrIssueValueInvalid, err)
-	}
-
-	return issue, nil
+	return matches[1], nil
 }

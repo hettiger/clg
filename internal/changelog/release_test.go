@@ -14,13 +14,13 @@ import (
 
 func TestNewRelease(t *testing.T) {
 	tests := []struct {
-		name         string
-		groups       map[string]string
-		types        map[string]string
-		entries      []changelog.ChangelogEntry
-		issuePrefix  string
-		issuePattern string
-		wantErrMsg   string
+		name               string
+		groups             map[string]string
+		types              map[string]string
+		entries            []changelog.ChangelogEntry
+		issueDisplayPrefix string
+		issuePattern       string
+		wantErrMsg         string
 	}{
 		{
 			name:       "empty sections",
@@ -118,7 +118,7 @@ func TestNewRelease(t *testing.T) {
 				time.Now(),
 				tt.groups,
 				tt.types,
-				tt.issuePrefix,
+				tt.issueDisplayPrefix,
 				tt.issuePattern,
 			)
 
@@ -137,16 +137,16 @@ func TestNewRelease(t *testing.T) {
 
 func TestReleaseMarkdown(t *testing.T) {
 	tests := []struct {
-		name         string
-		tag          string
-		entries      []changelog.ChangelogEntry
-		groups       map[string]string
-		types        map[string]string
-		issuePrefix  string
-		issuePattern string
-		time         time.Time
-		wantFixture  string
-		wantErr      bool
+		name               string
+		tag                string
+		entries            []changelog.ChangelogEntry
+		groups             map[string]string
+		types              map[string]string
+		issueDisplayPrefix string
+		issuePattern       string
+		time               time.Time
+		wantFixture        string
+		wantErr            bool
 	}{
 		{
 			name: "single change",
@@ -309,11 +309,11 @@ func TestReleaseMarkdown(t *testing.T) {
 					Branch: "feature/3-fake-branch",
 				},
 			},
-			types:        testdata.Types(),
-			issuePrefix:  "#",
-			issuePattern: "^feature/(\\d+)-",
-			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture:  "release_single_change_issue.md",
+			types:              testdata.Types(),
+			issueDisplayPrefix: "#",
+			issuePattern:       "^feature/(\\d+)-",
+			time:               time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:        "release_single_change_issue.md",
 		},
 
 		{
@@ -328,12 +328,12 @@ func TestReleaseMarkdown(t *testing.T) {
 					Author: "[Fake Author](https://github.com/fake-author)",
 				},
 			},
-			groups:       testdata.Groups(),
-			types:        testdata.Types(),
-			issuePrefix:  "#",
-			issuePattern: "^feature/(\\d+)-",
-			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture:  "release_groups_single_change_issue_author.md",
+			groups:             testdata.Groups(),
+			types:              testdata.Types(),
+			issueDisplayPrefix: "#",
+			issuePattern:       "^feature/(\\d+)-",
+			time:               time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:        "release_groups_single_change_issue_author.md",
 		},
 
 		{
@@ -347,11 +347,11 @@ func TestReleaseMarkdown(t *testing.T) {
 					Author: "Fake Author",
 				},
 			},
-			types:        testdata.Types(),
-			issuePrefix:  "#",
-			issuePattern: "^feature/(\\d+)-",
-			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture:  "release_issue_pattern_mismatch.md",
+			types:              testdata.Types(),
+			issueDisplayPrefix: "#",
+			issuePattern:       "^feature/(\\d+)-",
+			time:               time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:        "release_issue_pattern_mismatch.md",
 		},
 
 		{
@@ -364,11 +364,11 @@ func TestReleaseMarkdown(t *testing.T) {
 					Branch: "feature/3-fake-branch",
 				},
 			},
-			types:        testdata.Types(),
-			issuePrefix:  "#",
-			issuePattern: "^feature/(\\d+-",
-			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantErr:      true,
+			types:              testdata.Types(),
+			issueDisplayPrefix: "#",
+			issuePattern:       "^feature/(\\d+-",
+			time:               time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantErr:            true,
 		},
 
 		{
@@ -381,11 +381,11 @@ func TestReleaseMarkdown(t *testing.T) {
 					Branch: "feature/3-fake-branch",
 				},
 			},
-			types:        testdata.Types(),
-			issuePrefix:  "#",
-			issuePattern: "^feature/(\\d+)-(.+)$",
-			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantErr:      true,
+			types:              testdata.Types(),
+			issueDisplayPrefix: "#",
+			issuePattern:       "^feature/(\\d+)-(.+)$",
+			time:               time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantErr:            true,
 		},
 
 		{
@@ -398,11 +398,11 @@ func TestReleaseMarkdown(t *testing.T) {
 					Branch: "feature/3-fake-branch",
 				},
 			},
-			types:        testdata.Types(),
-			issuePrefix:  "",
-			issuePattern: "",
-			time:         time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
-			wantFixture:  "release_single_change.md",
+			types:              testdata.Types(),
+			issueDisplayPrefix: "",
+			issuePattern:       "",
+			time:               time.Date(2026, 9, 13, 0, 0, 0, 0, time.UTC),
+			wantFixture:        "release_single_change.md",
 		},
 	}
 	for _, tt := range tests {
@@ -415,7 +415,7 @@ func TestReleaseMarkdown(t *testing.T) {
 				tt.time,
 				tt.groups,
 				tt.types,
-				tt.issuePrefix,
+				tt.issueDisplayPrefix,
 				tt.issuePattern,
 			)
 			require.NoError(t, err)

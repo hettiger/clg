@@ -8,11 +8,11 @@ import (
 )
 
 type Release struct {
-	tag          string
-	time         time.Time
-	sections     []section
-	issuePrefix  string
-	issuePattern string
+	tag                string
+	time               time.Time
+	sections           []section
+	issueDisplayPrefix string
+	issuePattern       string
 }
 
 func NewRelease(
@@ -21,7 +21,7 @@ func NewRelease(
 	releaseTime time.Time,
 	groups map[string]string,
 	types map[string]string,
-	issuePrefix string,
+	issueDisplayPrefix string,
 	issuePattern string,
 ) (Release, error) {
 	sections := buildSections(groups, types)
@@ -31,11 +31,11 @@ func NewRelease(
 	}
 
 	release := Release{
-		tag:          tag,
-		time:         releaseTime,
-		sections:     sections,
-		issuePrefix:  issuePrefix,
-		issuePattern: issuePattern,
+		tag:                tag,
+		time:               releaseTime,
+		sections:           sections,
+		issueDisplayPrefix: issueDisplayPrefix,
+		issuePattern:       issuePattern,
 	}
 
 	for _, entry := range unreleasedEntries {
@@ -114,7 +114,7 @@ func (r Release) renderTypeSectionsMarkdown(
 		for _, e := range groupedEntries {
 			issue, err := e.Issue(r.issuePattern)
 			switch {
-			case err == nil, errors.Is(err, ErrIssuePatternMismatch), errors.Is(err, ErrIssueValueInvalid):
+			case err == nil, errors.Is(err, ErrIssuePatternMismatch):
 				// continue on success or unsupported branch names
 			default:
 				return err
@@ -122,10 +122,10 @@ func (r Release) renderTypeSectionsMarkdown(
 
 			var meta string
 			switch {
-			case issue != 0 && e.Author != "":
-				meta = fmt.Sprintf(" (%s%d, %s)", r.issuePrefix, issue, e.Author)
-			case issue != 0:
-				meta = fmt.Sprintf(" (%s%d)", r.issuePrefix, issue)
+			case issue != "" && e.Author != "":
+				meta = fmt.Sprintf(" (%s%d, %s)", r.issueDisplayPrefix, issue, e.Author)
+			case issue != "":
+				meta = fmt.Sprintf(" (%s%d)", r.issueDisplayPrefix, issue)
 			case e.Author != "":
 				meta = fmt.Sprintf(" (%s)", e.Author)
 			default:

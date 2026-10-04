@@ -15,6 +15,6 @@ type MarkdownConfig struct {
 }
 
 type IssueConfig struct {
-	Prefix  string `mapstructure:"prefix"`
-	Pattern string `mapstructure:"pattern"`
+	DisplayPrefix string `mapstructure:"displayPrefix"`
+	Pattern       string `mapstructure:"pattern"`
 }

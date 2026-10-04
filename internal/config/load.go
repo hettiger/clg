@@ -29,7 +29,7 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 		"author",
 		"markdown.listStyle",
 		"markdown.groupsAsList",
-		"issue.prefix",
+		"issue.displayPrefix",
 		"issue.pattern",
 	} {
 		if err := v.BindEnv(key); err != nil {

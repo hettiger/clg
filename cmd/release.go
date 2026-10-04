@@ -56,7 +56,7 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 		app.now(),
 		app.config.Groups,
 		app.config.Types,
-		app.config.Issue.Prefix,
+		app.config.Issue.DisplayPrefix,
 		app.config.Issue.Pattern,
 	)
 	if err != nil {
