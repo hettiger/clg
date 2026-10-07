@@ -24,6 +24,28 @@ func TestLoad(t *testing.T) {
 		require.Equal(t, "Asia/Kolkata", cfg.Timezone)
 	})
 
+	t.Run("it binds env vars", func(t *testing.T) {
+		t.Setenv("CLG_MARKER", "<!-- from env -->")
+		t.Setenv("CLG_TIMEZONE", "Europe/Paris")
+		t.Setenv("CLG_AUTHOR", "env author")
+		t.Setenv("CLG_MARKDOWN_LIST_STYLE", "*")
+		t.Setenv("CLG_MARKDOWN_GROUPS_AS_LIST", "true")
+		t.Setenv("CLG_ISSUE_DISPLAY_PREFIX", "issue-")
+		t.Setenv("CLG_ISSUE_PATTERN", "^task/(\\d+)-\\S+$")
+
+		cfg, err := Load(t.TempDir(), t.TempDir())
+		require.NoError(t, err)
+
+		require.Equal(t, "<!-- from env -->", cfg.Marker)
+		require.Equal(t, "Europe/Paris", cfg.Timezone)
+		require.NotNil(t, cfg.Author)
+		require.Equal(t, "env author", *cfg.Author)
+		require.Equal(t, "*", cfg.Markdown.ListStyle)
+		require.True(t, cfg.Markdown.GroupsAsList)
+		require.Equal(t, "issue-", cfg.Issue.DisplayPrefix)
+		require.Equal(t, "^task/(\\d+)-\\S+$", cfg.Issue.Pattern)
+	})
+
 	t.Run("environment overrides project config", func(t *testing.T) {
 		t.Setenv("CLG_TIMEZONE", "America/Los_Angeles")
 
@@ -44,49 +66,4 @@ func writeConfig(t *testing.T, dir, contents string) {
 
 	require.NoError(t, os.MkdirAll(dir, 0o755))
 	require.NoError(t, os.WriteFile(filepath.Join(dir, configFilename), []byte(contents), 0o600))
-}
-
-func TestLoadCanonicalEnvironmentNames(t *testing.T) {
-	t.Setenv("CLG_MARKER", "<!-- from env -->")
-	t.Setenv("CLG_TIMEZONE", "Europe/Paris")
-	t.Setenv("CLG_AUTHOR", "env author")
-	t.Setenv("CLG_MARKDOWN_LIST_STYLE", "*")
-	t.Setenv("CLG_MARKDOWN_GROUPS_AS_LIST", "true")
-	t.Setenv("CLG_ISSUE_DISPLAY_PREFIX", "issue-")
-	t.Setenv("CLG_ISSUE_PATTERN", "^task/(\\d+)-\\S+$")
-
-	cfg, err := Load(t.TempDir(), t.TempDir())
-	require.NoError(t, err)
-
-	require.Equal(t, "<!-- from env -->", cfg.Marker)
-	require.Equal(t, "Europe/Paris", cfg.Timezone)
-	require.NotNil(t, cfg.Author)
-	require.Equal(t, "env author", *cfg.Author)
-	require.Equal(t, "*", cfg.Markdown.ListStyle)
-	require.True(t, cfg.Markdown.GroupsAsList)
-	require.Equal(t, "issue-", cfg.Issue.DisplayPrefix)
-	require.Equal(t, "^task/(\\d+)-\\S+$", cfg.Issue.Pattern)
-}
-
-func TestLoadLegacyCamelCaseEnvironmentAliases(t *testing.T) {
-	t.Setenv("CLG_MARKDOWN_LISTSTYLE", "*")
-	t.Setenv("CLG_MARKDOWN_GROUPSASLIST", "true")
-	t.Setenv("CLG_ISSUE_DISPLAYPREFIX", "legacy-")
-
-	cfg, err := Load(t.TempDir(), t.TempDir())
-	require.NoError(t, err)
-
-	require.Equal(t, "*", cfg.Markdown.ListStyle)
-	require.True(t, cfg.Markdown.GroupsAsList)
-	require.Equal(t, "legacy-", cfg.Issue.DisplayPrefix)
-}
-
-func TestLoadCanonicalIssuePrefixEnvironmentNameTakesPrecedence(t *testing.T) {
-	t.Setenv("CLG_ISSUE_DISPLAY_PREFIX", "canonical-")
-	t.Setenv("CLG_ISSUE_DISPLAYPREFIX", "legacy-")
-
-	cfg, err := Load(t.TempDir(), t.TempDir())
-	require.NoError(t, err)
-
-	require.Equal(t, "canonical-", cfg.Issue.DisplayPrefix)
 }

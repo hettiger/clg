@@ -21,7 +21,6 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 	v.SetDefault("issue.displayPrefix", "#")
 	v.SetDefault("issue.pattern", "^(?:[^\\/]+\\/)?(\\d+)-\\S+$") // extracts `31` in `feature/31-description` or `31-description`
 
-	// Unmarshal only sees known keys, so bind every environment override by name.
 	for _, binding := range []struct {
 		key     string
 		envVars []string
@@ -29,9 +28,9 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 		{key: "marker", envVars: []string{"CLG_MARKER"}},
 		{key: "timezone", envVars: []string{"CLG_TIMEZONE"}},
 		{key: "author", envVars: []string{"CLG_AUTHOR"}},
-		{key: "markdown.listStyle", envVars: []string{"CLG_MARKDOWN_LIST_STYLE", "CLG_MARKDOWN_LISTSTYLE"}},
-		{key: "markdown.groupsAsList", envVars: []string{"CLG_MARKDOWN_GROUPS_AS_LIST", "CLG_MARKDOWN_GROUPSASLIST"}},
-		{key: "issue.displayPrefix", envVars: []string{"CLG_ISSUE_DISPLAY_PREFIX", "CLG_ISSUE_DISPLAYPREFIX"}},
+		{key: "markdown.listStyle", envVars: []string{"CLG_MARKDOWN_LIST_STYLE"}},
+		{key: "markdown.groupsAsList", envVars: []string{"CLG_MARKDOWN_GROUPS_AS_LIST"}},
+		{key: "issue.displayPrefix", envVars: []string{"CLG_ISSUE_DISPLAY_PREFIX"}},
 		{key: "issue.pattern", envVars: []string{"CLG_ISSUE_PATTERN"}},
 	} {
 		envVars := append([]string{binding.key}, binding.envVars...)

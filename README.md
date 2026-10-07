@@ -91,9 +91,6 @@ settings: `CLG_MARKER`, `CLG_TIMEZONE`, `CLG_AUTHOR`,
 `CLG_MARKDOWN_LIST_STYLE`, `CLG_MARKDOWN_GROUPS_AS_LIST`,
 `CLG_ISSUE_DISPLAY_PREFIX`, and `CLG_ISSUE_PATTERN`. Empty environment values
 are ignored, except that an empty `CLG_AUTHOR` disables attribution.
-The previous camel-case spellings remain accepted as fallback aliases:
-`CLG_MARKDOWN_LISTSTYLE`, `CLG_MARKDOWN_GROUPSASLIST`, and
-`CLG_ISSUE_DISPLAYPREFIX`. Canonical names take precedence.
 
 Set `timezone` to an IANA location name such as `America/New_York`; it defaults
 to `UTC`.
