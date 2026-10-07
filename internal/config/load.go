@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -22,22 +21,21 @@ func Load(userHomeDir, projectDir string) (Config, error) {
 	v.SetDefault("issue.displayPrefix", "#")
 	v.SetDefault("issue.pattern", "^(?:[^\\/]+\\/)?(\\d+)-\\S+$") // extracts `31` in `feature/31-description` or `31-description`
 
-	v.SetEnvPrefix("clg")
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	v.AutomaticEnv()
-
-	// Unmarshal only sees known keys, even when AutomaticEnv is enabled.
-	for _, key := range []string{
-		"marker",
-		"timezone",
-		"author",
-		"markdown.listStyle",
-		"markdown.groupsAsList",
-		"issue.displayPrefix",
-		"issue.pattern",
+	for _, binding := range []struct {
+		key     string
+		envVars []string
+	}{
+		{key: "marker", envVars: []string{"CLG_MARKER"}},
+		{key: "timezone", envVars: []string{"CLG_TIMEZONE"}},
+		{key: "author", envVars: []string{"CLG_AUTHOR"}},
+		{key: "markdown.listStyle", envVars: []string{"CLG_MARKDOWN_LIST_STYLE"}},
+		{key: "markdown.groupsAsList", envVars: []string{"CLG_MARKDOWN_GROUPS_AS_LIST"}},
+		{key: "issue.displayPrefix", envVars: []string{"CLG_ISSUE_DISPLAY_PREFIX"}},
+		{key: "issue.pattern", envVars: []string{"CLG_ISSUE_PATTERN"}},
 	} {
-		if err := v.BindEnv(key); err != nil {
-			return Config{}, fmt.Errorf("bind environment variable for %q: %w", key, err)
+		envVars := append([]string{binding.key}, binding.envVars...)
+		if err := v.BindEnv(envVars...); err != nil {
+			return Config{}, fmt.Errorf("bind environment variable for %q: %w", binding.key, err)
 		}
 	}
 

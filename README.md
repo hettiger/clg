@@ -86,10 +86,11 @@ Both configuration files are optional:
 - `.clg.yml` in the current working directory: shared project settings.
 
 Project settings override global settings, which override built-in defaults.
-Nested mappings merge field by field. Environment variables override file
-settings, using the `CLG_` prefix and underscores for nested keys (for example,
-`CLG_MARKER` and `CLG_TIMEZONE`). Empty environment values are ignored, except
-for `CLG_AUTHOR`.
+Nested mappings merge field by field. These environment variables override file
+settings: `CLG_MARKER`, `CLG_TIMEZONE`, `CLG_AUTHOR`,
+`CLG_MARKDOWN_LIST_STYLE`, `CLG_MARKDOWN_GROUPS_AS_LIST`,
+`CLG_ISSUE_DISPLAY_PREFIX`, and `CLG_ISSUE_PATTERN`. Empty environment values
+are ignored, except that an empty `CLG_AUTHOR` disables attribution.
 
 Set `timezone` to an IANA location name such as `America/New_York`; it defaults
 to `UTC`.
@@ -166,7 +167,7 @@ for the issue identifier; invalid patterns block release generation. Set
 `issue.pattern: ""` or use `clg release <tag> --issue-pattern ""` to disable
 issue references.
 
-Environment overrides are `CLG_ISSUE_DISPLAYPREFIX` and `CLG_ISSUE_PATTERN`.
+Environment overrides are `CLG_ISSUE_DISPLAY_PREFIX` and `CLG_ISSUE_PATTERN`.
 Release flags override configuration for that release only.
 
 ## Entry format
