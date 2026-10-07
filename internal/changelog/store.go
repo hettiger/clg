@@ -96,7 +96,7 @@ func (s EntryStore) Write(entry ChangelogEntry) (string, error) {
 
 	filename, err := entry.Filename(s.uuidV7)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	path := filepath.Join(dir, filename)
