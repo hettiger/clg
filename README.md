@@ -64,8 +64,9 @@ Group entries by type, or by group and then type, and insert a release into
 `CHANGELOG.md` using the current date in the configured timezone (UTC by default).
 Deletes the source entries afterward; does nothing when there are no entries.
 
-The insertion marker must already exist. Override the configured marker with
-`-m, --marker` or the timezone with `-t, --timezone`. Issue references can be
+A non-empty insertion marker must already exist. Use `--marker ""` (or configure
+an empty marker) to prepend releases without a marker. Override the configured
+marker with `-m, --marker` or the timezone with `-t, --timezone`. Issue references can be
 customized with `-p, --issue-display-prefix` and `-i, --issue-pattern`; see
 [Issue references](#issue-references).
 
