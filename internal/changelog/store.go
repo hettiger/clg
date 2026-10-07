@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/google/renameio/v2/maybe"
 	"github.com/hettiger/clg/internal/support"
 )
 
@@ -101,7 +102,7 @@ func (s EntryStore) Write(entry ChangelogEntry) (string, error) {
 
 	path := filepath.Join(dir, filename)
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := maybe.WriteFile(path, data, 0644); err != nil {
 		return "", err
 	}
 
