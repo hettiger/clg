@@ -100,6 +100,24 @@ func TestChangelogFileAddRelease(t *testing.T) {
 			wantFixture: "changelog.want.md",
 		},
 		{
+			name:        "empty marker with empty file",
+			fixture:     "changelog_empty.md",
+			marker:      "",
+			wantFixture: "changelog_empty.want.md",
+		},
+		{
+			name:        "empty marker with existing release",
+			fixture:     "changelog_without_marker.md",
+			marker:      "",
+			wantFixture: "changelog_without_marker.want.md",
+		},
+		{
+			name:        "empty marker without trailing newline",
+			fixture:     "changelog_without_marker_no_newline.md",
+			marker:      "",
+			wantFixture: "changelog_without_marker.want.md",
+		},
+		{
 			name:       "unsupported marker",
 			fixture:    "changelog.md",
 			marker:     "<!-- Unsupported Marker -->",

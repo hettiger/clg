@@ -27,7 +27,7 @@ func (f ChangelogFile) AddRelease(release Markdownable) (string, error) {
 		return "", err
 	}
 
-	if !strings.Contains(log, f.Marker) {
+	if f.Marker != "" && !strings.Contains(log, f.Marker) {
 		return "", fmt.Errorf(`Marker "%s" is missing in CHANGELOG.md`, f.Marker)
 	}
 
@@ -36,7 +36,11 @@ func (f ChangelogFile) AddRelease(release Markdownable) (string, error) {
 		return "", err
 	}
 
-	log = strings.Replace(log, f.Marker, f.Marker+"\n\n"+md+"\n", 1)
+	if f.Marker == "" {
+		log = md + "\n\n\n" + log
+	} else {
+		log = strings.Replace(log, f.Marker, f.Marker+"\n\n"+md+"\n", 1)
+	}
 
 	return md, f.Write(strings.TrimSpace(log) + "\n")
 }
