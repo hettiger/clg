@@ -79,9 +79,9 @@ func addRelease(app *App, args []string, state *releaseCmdState) error {
 		return output.PrintSuccess("No changelog entries. Nothing to release.")
 	}
 
-	unreleasedEntries, err := app.entryStore.UnreleasedEntries()
-	if err != nil {
-		return err
+	unreleasedEntries := make([]changelog.ChangelogEntry, len(entryFiles))
+	for i, f := range entryFiles {
+		unreleasedEntries[i] = f.Entry
 	}
 
 	release, err := changelog.NewRelease(
