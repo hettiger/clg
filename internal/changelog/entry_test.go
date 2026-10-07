@@ -2,6 +2,7 @@ package changelog_test
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/hettiger/clg/internal/changelog"
@@ -76,7 +77,7 @@ func TestNewChangelogEntry(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data, err := os.ReadFile("testdata/" + tt.dataFile)
+			data, err := os.ReadFile(filepath.Join("testdata", tt.dataFile))
 			require.NoError(t, err)
 			got, gotErr := changelog.NewChangelogEntry(data, tt.groupKeys, testdata.TypeKeys())
 
@@ -155,7 +156,7 @@ func TestEntryFilename(t *testing.T) {
 }
 
 func TestEntryYAML(t *testing.T) {
-	dataValid, err := os.ReadFile("testdata/entry_valid.yml")
+	dataValid, err := os.ReadFile(filepath.Join("testdata", "entry_valid.yml"))
 	require.NoError(t, err)
 	entry, err := changelog.NewChangelogEntry(dataValid, []string{}, testdata.TypeKeys())
 	require.NoError(t, err)
