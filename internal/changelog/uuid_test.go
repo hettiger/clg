@@ -1,5 +1,5 @@
 package changelog_test
 
-func uuidV7() (string, error) {
-	return "fake-uuid", nil
+func uuidV7() string {
+	return "fake-uuid"
 }

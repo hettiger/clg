@@ -1,7 +1,6 @@
 package changelog_test
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -96,7 +95,7 @@ func TestEntryFilename(t *testing.T) {
 	tests := []struct {
 		name    string
 		entry   changelog.ChangelogEntry
-		uuidV7  func() (string, error)
+		uuidV7  func() string
 		want    string
 		wantErr bool
 	}{
@@ -107,8 +106,8 @@ func TestEntryFilename(t *testing.T) {
 				Title:  "fake message",
 				Branch: "fake-branch",
 			},
-			uuidV7: func() (string, error) {
-				return "fake-uuidv7", nil
+			uuidV7: func() string {
+				return "fake-uuidv7"
 			},
 			want: "changed-fake-uuidv7.yml",
 		},
@@ -119,8 +118,8 @@ func TestEntryFilename(t *testing.T) {
 				Title:  "fake message",
 				Branch: "fake-branch",
 			},
-			uuidV7: func() (string, error) {
-				return "fake-uuidv7", nil
+			uuidV7: func() string {
+				return "fake-uuidv7"
 			},
 			want: "added-fake-uuidv7.yml",
 		},
@@ -132,23 +131,10 @@ func TestEntryFilename(t *testing.T) {
 				Title:  "fake message",
 				Branch: "fake-branch",
 			},
-			uuidV7: func() (string, error) {
-				return "fake-uuidv7", nil
+			uuidV7: func() string {
+				return "fake-uuidv7"
 			},
 			want: "front-added-fake-uuidv7.yml",
-		},
-		{
-			name: "uuid error",
-			entry: changelog.ChangelogEntry{
-				Group:  "front",
-				Type:   "added",
-				Title:  "fake message",
-				Branch: "fake-branch",
-			},
-			uuidV7: func() (string, error) {
-				return "", errors.New("error fake")
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

@@ -75,19 +75,18 @@ func (e ChangelogEntry) Validate(groupKeys, typeKeys []string) error {
 	return nil
 }
 
-func (e ChangelogEntry) Filename(uuidV7 func() (string, error)) (string, error) {
-	id, err := uuidV7()
-	if err != nil {
-		return "", err
-	}
-
+func (e ChangelogEntry) Filename(uuidV7 func() string) (string, error) {
 	var filename strings.Builder
 
 	if e.Group != "" {
-		fmt.Fprintf(&filename, "%s-", e.Group)
+		if _, err := fmt.Fprintf(&filename, "%s-", e.Group); err != nil {
+			return "", err
+		}
 	}
 
-	fmt.Fprintf(&filename, "%s-%s.yml", e.Type, id)
+	if _, err := fmt.Fprintf(&filename, "%s-%s.yml", e.Type, uuidV7()); err != nil {
+		return "", err
+	}
 
 	return filename.String(), nil
 }
