@@ -9,14 +9,14 @@ import (
 
 type EntryStore struct {
 	rootDir   string
-	uuidV7    func() (string, error)
+	uuidV7    func() string
 	groupKeys []string
 	typeKeys  []string
 }
 
 func NewEntryStore(
 	root string,
-	uuidV7 func() (string, error),
+	uuidV7 func() string,
 	groups,
 	types map[string]string,
 ) EntryStore {

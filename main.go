@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 	_ "time/tzdata"
+	"uuid"
 
-	"github.com/google/uuid"
 	"github.com/hettiger/clg/cmd"
 	"github.com/hettiger/clg/internal/changelog"
 	"github.com/hettiger/clg/internal/config"
@@ -32,13 +32,8 @@ func main() {
 		return time.Now().UTC()
 	}
 
-	uuidV7 := func() (string, error) {
-		u, err := uuid.NewV7()
-		if err != nil {
-			return "", err
-		}
-
-		return u.String(), nil
+	uuidV7 := func() string {
+		return uuid.NewV7().String()
 	}
 
 	entryStore := changelog.NewEntryStore(
