@@ -64,19 +64,19 @@ func TestGitService_AuthorName(t *testing.T) {
 	}{
 		{
 			name:    "author",
-			config:  "testdata/gitconfig_author",
+			config:  filepath.Join("testdata", "gitconfig_author"),
 			want:    "Fake Author",
 			wantErr: false,
 		},
 		{
 			name:    "empty author",
-			config:  "testdata/gitconfig_empty_author",
+			config:  filepath.Join("testdata", "gitconfig_empty_author"),
 			want:    "",
 			wantErr: false,
 		},
 		{
 			name:    "missing author",
-			config:  "testdata/gitconfig_missing_author",
+			config:  filepath.Join("testdata", "gitconfig_missing_author"),
 			want:    "",
 			wantErr: true,
 		},

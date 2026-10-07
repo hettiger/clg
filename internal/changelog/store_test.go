@@ -1,6 +1,7 @@
 package changelog_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/hettiger/clg/internal/changelog"
@@ -22,12 +23,12 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		},
 		{
 			name:       "invalid entry",
-			fixtureDir: "testdata/roots/invalid_entry",
+			fixtureDir: filepath.Join("testdata", "roots", "invalid_entry"),
 			wantErrMsg: "type must be one of the following values",
 		},
 		{
 			name:       "unexpected file",
-			fixtureDir: "testdata/roots/unexpected_file",
+			fixtureDir: filepath.Join("testdata", "roots", "unexpected_file"),
 			want: []changelog.ChangelogEntry{
 				{
 					Type:   "added",
@@ -38,7 +39,7 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		},
 		{
 			name:       "unexpected subdir",
-			fixtureDir: "testdata/roots/unexpected_subdir",
+			fixtureDir: filepath.Join("testdata", "roots", "unexpected_subdir"),
 			want: []changelog.ChangelogEntry{
 				{
 					Type:   "added",
@@ -49,7 +50,7 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		},
 		{
 			name:       "single entry",
-			fixtureDir: "testdata/roots/single_entry",
+			fixtureDir: filepath.Join("testdata", "roots", "single_entry"),
 			want: []changelog.ChangelogEntry{
 				{
 					Type:   "added",
@@ -60,7 +61,7 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 		},
 		{
 			name:       "multiple entries",
-			fixtureDir: "testdata/roots/multiple_entries",
+			fixtureDir: filepath.Join("testdata", "roots", "multiple_entries"),
 			want: []changelog.ChangelogEntry{
 				{
 					Type:   "added",
@@ -123,7 +124,7 @@ func TestEntryStoreWrite(t *testing.T) {
 				Title:  "Simple Change",
 				Branch: "fake-branch",
 			},
-			wantPath: "changelogs/unreleased/changed-fake-uuid.yml",
+			wantPath: filepath.Join("changelogs", "unreleased", "changed-fake-uuid.yml"),
 		},
 		{
 			name: "valid feature",
@@ -132,7 +133,7 @@ func TestEntryStoreWrite(t *testing.T) {
 				Title:  "Simple Feature",
 				Branch: "fake-branch",
 			},
-			wantPath: "changelogs/unreleased/added-fake-uuid.yml",
+			wantPath: filepath.Join("changelogs", "unreleased", "added-fake-uuid.yml"),
 		},
 		{
 			name:   "valid group",
@@ -143,7 +144,7 @@ func TestEntryStoreWrite(t *testing.T) {
 				Title:  "Simple Feature",
 				Branch: "fake-branch",
 			},
-			wantPath: "changelogs/unreleased/front-added-fake-uuid.yml",
+			wantPath: filepath.Join("changelogs", "unreleased", "front-added-fake-uuid.yml"),
 		},
 		{
 			name: "invalid type",
@@ -198,7 +199,7 @@ func TestEntryStoreWrite(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			require.Contains(t, gotPath, tt.wantPath)
+			require.Equal(t, filepath.Join(root, tt.wantPath), gotPath)
 		})
 	}
 }

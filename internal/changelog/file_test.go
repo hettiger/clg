@@ -12,6 +12,8 @@ import (
 )
 
 func TestNewChangelogFile(t *testing.T) {
+	dir := t.TempDir()
+
 	tests := []struct {
 		name   string
 		dir    string
@@ -20,10 +22,10 @@ func TestNewChangelogFile(t *testing.T) {
 	}{
 		{
 			name:   "valid input",
-			dir:    "/tmp/test/",
+			dir:    dir,
 			marker: "<!-- Fake Marker -->",
 			want: changelog.ChangelogFile{
-				Path:   "/tmp/test/CHANGELOG.md",
+				Path:   filepath.Join(dir, "CHANGELOG.md"),
 				Marker: "<!-- Fake Marker -->",
 			},
 		},
