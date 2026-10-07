@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/google/renameio/v2/maybe"
 	"github.com/hettiger/clg/internal/changelog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -120,7 +121,7 @@ func TestChangelogFileAddRelease(t *testing.T) {
 				fakeData, err := os.ReadFile(filepath.Join("testdata", tt.fixture))
 				require.NoError(t, err)
 
-				err = os.WriteFile(filepath.Join(dir, "CHANGELOG.md"), fakeData, 0644)
+				err = maybe.WriteFile(filepath.Join(dir, "CHANGELOG.md"), fakeData, 0644)
 				require.NoError(t, err)
 			}
 

@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/google/renameio/v2/maybe"
 )
 
 type ChangelogFile struct {
@@ -49,5 +51,5 @@ func (f ChangelogFile) Read() (string, error) {
 }
 
 func (f ChangelogFile) Write(log string) error {
-	return os.WriteFile(f.Path, []byte(log), 0644)
+	return maybe.WriteFile(f.Path, []byte(log), 0644)
 }
