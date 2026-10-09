@@ -76,28 +76,16 @@ func (e ChangelogEntry) Validate(groupKeys, typeKeys []string) error {
 	return nil
 }
 
-func (e ChangelogEntry) Filename(uuidV7 func() string) (string, error) {
-	var filename strings.Builder
-
-	normalize := func(key string) string {
-		if name := support.KebabCase(key); name != "" {
-			return name
-		}
-
-		return "entry"
-	}
-
-	if e.Group != "" {
-		if _, err := fmt.Fprintf(&filename, "%s-", normalize(e.Group)); err != nil {
-			return "", err
+func (e ChangelogEntry) Filename(uuidV7 func() string) string {
+	var parts []string
+	for _, key := range []string{e.Group, e.Type} {
+		if part := support.KebabCase(key); part != "" {
+			parts = append(parts, part)
 		}
 	}
+	parts = append(parts, uuidV7())
 
-	if _, err := fmt.Fprintf(&filename, "%s-%s.yml", normalize(e.Type), uuidV7()); err != nil {
-		return "", err
-	}
-
-	return filename.String(), nil
+	return strings.Join(parts, "-") + ".yml"
 }
 
 var (
