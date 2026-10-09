@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/hettiger/clg/internal/support"
 	"github.com/hettiger/clg/internal/validation"
 	"go.yaml.in/yaml/v3"
 )
@@ -78,13 +79,21 @@ func (e ChangelogEntry) Validate(groupKeys, typeKeys []string) error {
 func (e ChangelogEntry) Filename(uuidV7 func() string) (string, error) {
 	var filename strings.Builder
 
+	normalize := func(key string) string {
+		if name := support.KebabCase(key); name != "" {
+			return name
+		}
+
+		return "entry"
+	}
+
 	if e.Group != "" {
-		if _, err := fmt.Fprintf(&filename, "%s-", e.Group); err != nil {
+		if _, err := fmt.Fprintf(&filename, "%s-", normalize(e.Group)); err != nil {
 			return "", err
 		}
 	}
 
-	if _, err := fmt.Fprintf(&filename, "%s-%s.yml", e.Type, uuidV7()); err != nil {
+	if _, err := fmt.Fprintf(&filename, "%s-%s.yml", normalize(e.Type), uuidV7()); err != nil {
 		return "", err
 	}
 
