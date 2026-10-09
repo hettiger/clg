@@ -94,11 +94,10 @@ func TestNewChangelogEntry(t *testing.T) {
 
 func TestEntryFilename(t *testing.T) {
 	tests := []struct {
-		name    string
-		entry   changelog.ChangelogEntry
-		uuidV7  func() string
-		want    string
-		wantErr bool
+		name   string
+		entry  changelog.ChangelogEntry
+		uuidV7 func() string
+		want   string
 	}{
 		{
 			name: "changed",
@@ -142,15 +141,25 @@ func TestEntryFilename(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, gotErr := tt.entry.Filename(tt.uuidV7)
-
-			if tt.wantErr {
-				require.Error(t, gotErr)
-			} else {
-				require.NoError(t, gotErr)
-			}
+			got := tt.entry.Filename(tt.uuidV7)
 
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestEntryFilenameSkipsEmptyParts(t *testing.T) {
+	for _, tt := range []struct {
+		group, changeType, want string
+	}{
+		{"ööö", "fixed", "fixed-fake-uuid.yml"},
+		{"backend", "...", "backend-fake-uuid.yml"},
+		{"ööö", "...", "fake-uuid.yml"},
+	} {
+		t.Run(tt.want, func(t *testing.T) {
+			entry := changelog.ChangelogEntry{Group: tt.group, Type: tt.changeType}
+			name := entry.Filename(uuidV7)
+			require.Equal(t, tt.want, name)
 		})
 	}
 }

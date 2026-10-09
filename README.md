@@ -174,7 +174,8 @@ Release flags override configuration for that release only.
 ## Entry format
 
 Entries live in `changelogs/unreleased/`, named `<type>-<UUIDv7>.yml` or
-`<group>-<type>-<UUIDv7>.yml` when groups are configured:
+`<group>-<type>-<UUIDv7>.yml` when groups are configured. Filename keys use ASCII
+kebab-case, omitting empty parts. YAML keeps the original keys:
 
 ```yaml
 group: back
