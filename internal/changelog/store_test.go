@@ -109,6 +109,27 @@ func TestEntryStoreUnreleasedEntries(t *testing.T) {
 	}
 }
 
+func TestEntryStoreWriteNormalizesConfiguredKeys(t *testing.T) {
+	root := t.TempDir()
+	entry := changelog.ChangelogEntry{
+		Group: "../../backend",
+		Type:  "../../fixed",
+		Title: "Test change",
+	}
+	store := changelog.NewEntryStore(root, uuidV7,
+		map[string]string{entry.Group: "Backend"},
+		map[string]string{entry.Type: "Fixed"},
+	)
+
+	path, err := store.Write(entry)
+	require.NoError(t, err)
+	require.Equal(t, filepath.Join(root, "changelogs", "unreleased", "backend-fixed-fake-uuid.yml"), path)
+
+	entries, err := store.UnreleasedEntries()
+	require.NoError(t, err)
+	require.Equal(t, []changelog.ChangelogEntry{entry}, entries)
+}
+
 func TestEntryStoreWrite(t *testing.T) {
 	tests := []struct {
 		name     string
